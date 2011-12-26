@@ -1,5 +1,6 @@
-package gsingh.busapp;
+package gsingh.busapp.userclient;
 
+import gsingh.busapp.R;
 import android.content.Context;
 import android.location.LocationListener;
 import android.location.LocationManager;

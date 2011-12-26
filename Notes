@@ -2,3 +2,7 @@ Figure out the text view properties
 Learn correct units
 
 Application Flow:
+BusClient - Updates server with Long/Lat corresponding to route name
+Server - Calculates times and distances for each stop
+Server - Updates coord.xml
+UserClient - Polls server for information for all routes

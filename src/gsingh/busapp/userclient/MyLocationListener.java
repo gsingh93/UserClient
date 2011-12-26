@@ -1,4 +1,4 @@
-package gsingh.busapp;
+package gsingh.busapp.userclient;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
