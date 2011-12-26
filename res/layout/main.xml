@@ -3,25 +3,17 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
-    
+    
+    <!-- Begin Navbar -->
 	<LinearLayout
 	    style="@style/TitleBar"
 	    android:background="@drawable/navgradient" >
 
-	    <TextView
-	        android:layout_width="wrap_content"
-	        android:layout_height="fill_parent"
-	        android:padding="8dip"
-	        android:layout_weight=".40"
-	        android:gravity="center"
-	        android:text="Logo"
-	        android:textSize="23dip"
-	        android:textColor="#fff"
-	         />
-
-	    <ImageView style="@style/TitleBarSeparator" />
+	    <TextView style="@style/TitleBarLogo" />
 
 	    <TextView style="@style/TitleBarText" />
+	    
+	    <ImageView style="@style/TitleBarSeparator" />
 
 	    <ImageButton
 	        style="@style/TitleBarButton"
@@ -29,19 +21,14 @@
 	        android:src="@drawable/crosshair" />
 	</LinearLayout>
 
+	<!-- End Navbar -->
+	
     <TextView
         android:id="@+id/textview"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        
         android:text="Click the locate button to find position" />
-    <!-- android:layout_weight="0.50" -->
-    <com.google.android.maps.MapView
-        android:id="@+id/mapview"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:clickable="true"
-        android:apiKey="0eCUOamfZWjBmFiGNkKroL5JbsBTCD9DwTOaYfQ"
-    /> 
+    
+    <com.google.android.maps.MapView style="@style/MapStyle" /> 
 
 </LinearLayout> 

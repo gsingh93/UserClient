@@ -8,17 +8,24 @@
 	</style>
 	<style name="TitleBarLogo">
 	    <item name="android:layout_width">wrap_content</item>
-	    <item name="android:layout_height">wrap_content</item>
+	    <item name="android:layout_height">fill_parent</item>
+	    <item name="android:padding">8dip</item>
+	    <item name="android:layout_weight">.40</item>
+	    <item name="android:gravity">center</item>
+	    <item name="android:text">Logo</item>
+	    <item name="android:textSize">23dip</item>
+	    <item name="android:textColor">#fff</item>
 	</style>
 	<style name="TitleBarButton">
 	    <item name="android:layout_width">45dip</item>
 	    <item name="android:layout_height">fill_parent</item>
 		<item name="android:background">@drawable/title_button</item>
+		<item name="android:contentDescription">Get Location</item>
 	</style>
 	<style name="TitleBarSeparator">
-	    <item name="android:layout_width">1px</item>
+	    <item name="android:layout_width">10px</item>
 	    <item name="android:layout_height">fill_parent</item>
-		<item name="android:color">#40ffffff</item>
+		<item name="android:background">#000</item>
 	</style>
 	<style name="TitleBarText">
 	    <item name="android:id">@+id/title_text</item>
@@ -33,5 +40,12 @@
         <item name="android:textColor">#fff</item>
         <item name="android:singleLine">true</item>
         <item name="android:ellipsize">end</item>
+	</style>
+	<style name="MapStyle">
+	    <item name="android:id">@+id/mapview</item>
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">fill_parent</item>
+        <item name="android:clickable">true</item>
+        <item name="android:apiKey">0eCUOamfZWjBmFiGNkKroL5JbsBTCD9DwTOaYfQ</item>
 	</style>
 </resources> 

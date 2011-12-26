@@ -58,22 +58,14 @@ public class MyLocationListener implements LocationListener {
 		// Send location to server
 		URLText = "http://michigangurudwara.com/bus.php?lat=" + lat + "&lon="
 				+ lon;
-
+		
 		// Set up HTTP objects
 		DefaultHttpClient hc = new DefaultHttpClient();
-		ResponseHandler<String> res = new BasicResponseHandler();
 		HttpPost postMethod = new HttpPost(URLText);
-
-		// TODO: Is the below necessary?
-		// Create data object
-		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-		nameValuePairs.add(new BasicNameValuePair("lat", String.valueOf(lat)));
-		nameValuePairs.add(new BasicNameValuePair("lon", String.valueOf(lon)));
 
 		// Send data
 		try {
-			postMethod.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-			String response = hc.execute(postMethod, res);
+			hc.execute(postMethod);
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

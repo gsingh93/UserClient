@@ -26,7 +26,6 @@ public final class R {
         public static final int title_logo_selected=0x7f02000c;
     }
     public static final class id {
-        public static final int mapview=0x7f060001;
         public static final int textview=0x7f060000;
     }
     public static final class layout {
@@ -38,6 +37,7 @@ public final class R {
         public static final int hello=0x7f040000;
     }
     public static final class style {
+        public static final int MapStyle=0x7f050005;
         public static final int TitleBar=0x7f050000;
         public static final int TitleBarButton=0x7f050002;
         public static final int TitleBarLogo=0x7f050001;
