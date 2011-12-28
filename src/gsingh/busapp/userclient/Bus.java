@@ -31,8 +31,12 @@ public class Bus {
 			this.lon = lon;
 		}
 
-		public double[] getArrivalInfo() {
-			return new double[] { arrivalTime, arrivalDistance };
+		public double getArrivalTime() {
+			return arrivalTime;
+		}
+
+		public double getArrivalDistance() {
+			return arrivalDistance;
 		}
 		
 		public void setArrivalInfo(double time, double distance) {
@@ -46,13 +50,13 @@ public class Bus {
 	private double lat;
 	private double lon;
 
-	List<Stop> stops = new LinkedList<Stop>();
+	private List<Stop> stopList = new LinkedList<Stop>();
 	
 	Bus(String name, List<String> stopNames) {
 		this.name = name;
 
 		for (String stopName : stopNames) {
-			this.stops.add(new Stop(stopName));
+			this.stopList.add(new Stop(stopName));
 		}
 	}
 
@@ -68,9 +72,32 @@ public class Bus {
 		this.lat = lat;
 		this.lon = lon;
 	}
-
-	public List<Stop> getStops() {
-		return stops;
+	
+	public List<String> getStopNames() {
+		List<String> stopNames = new LinkedList<String>();
+		for (Stop stop : stopList) {
+			stopNames.add(stop.getName());
+		}
+		return stopNames;
 	}
 
+	public List<Double> getStopTimes() {
+		List<Double> stopTimes = new LinkedList<Double>();
+		for (Stop stop : stopList) {
+			stopTimes.add(stop.getArrivalTime());
+		}
+		return stopTimes;
+	}
+
+	public List<Double> getStopDistances() {
+		List<Double> stopDistances = new LinkedList<Double>();
+		for (Stop stop : stopList) {
+			stopDistances.add(stop.getArrivalDistance());
+		}
+		return stopDistances;
+	}
+	
+	public List<Stop> getStops() {
+		return stopList;
+	}
 }

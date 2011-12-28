@@ -10,19 +10,19 @@ if(!empty($_GET['lat']))
 		<lat>".$_GET['lat']."</lat>\n
 		<lon>".$_GET['lon']."</lon>\n
 		<stop>\n
-			<name>Stop1</name>\n
-			<distance>1</distance>\n
-			<time>1</time>\n
+			<name>".$_GET['name[0]']."</name>\n
+			<distance>".$_GET['distance[0]']."</distance>\n
+			<time>".$_GET['time[0]']."</time>\n
 		</stop>\n
 		<stop>\n
-			<name>Stop2</name>\n
-			<distance>1</distance>\n
-			<time>1</time>\n
+			<name>".$_GET['name[1]']."</name>\n
+			<distance>".$_GET['distance[1]']."</distance>\n
+			<time>".$_GET['time[1]']."</time>\n
 		</stop>\n
 		<stop>\n
-			<name>Stop3</name>\n
-			<distance>1</distance>\n
-			<time>1</time>\n
+			<name>".$_GET['name[2]']."</name>\n
+			<distance>".$_GET['distance[2]']."</distance>\n
+			<time>".$_GET['time[2]']."</time>\n
 		</stop>\n
 	</route>\n";
 	fwrite($file, $text);

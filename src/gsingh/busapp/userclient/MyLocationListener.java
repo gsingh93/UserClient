@@ -59,7 +59,7 @@ public class MyLocationListener implements LocationListener {
 	/**
 	 * List of all buses/routes in XML file
 	 */
-	private List<Bus> busList;
+	private List<Bus> busList = new LinkedList<Bus>();
 
 	MyLocationListener(TextView display) {
 		super();
@@ -81,8 +81,52 @@ public class MyLocationListener implements LocationListener {
 	}
 
 	private void updateBusLocation(Bus bus) {
+		
+		// TODO: Add route name
+		// Location POST URL
+		URLText = String
+				.format("http://michigangurudwara.com/bus.php?routeName=%s&lat=%f&lon=%f",
+						bus.getName(), lat, lon);
 
+		List<String> stopNames = bus.getStopNames();
+		List<Double> times = bus.getStopTimes();
+		List<Double> distances = bus.getStopDistances();
+
+		int i = 0;
+		StringBuilder sb = new StringBuilder(URLText);
+		for (String name : stopNames) {
+			sb.append("&name[").append(i).append("]=").append(name);
+			sb.append("&time[").append(i).append("]=").append(times.get(i));
+			sb.append("&distance[").append(i).append("]=")
+					.append(distances.get(i));
+			i++;
+		}
+		
+		URLText = sb.toString();
+		
+		URLText = URLText.replace(" ", "%20");
+		
+		Log.d("tag", URLText);
+
+		// Initialize HTTP objects
+		DefaultHttpClient hc = new DefaultHttpClient();
+		HttpPost postMethod = new HttpPost(URLText);
+
+		// POST data
+		try {
+			hc.execute(postMethod);
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClientProtocolException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
+
 
 	private void updateScreenText() {
 		// Create text to be displayed on screen
@@ -235,6 +279,11 @@ public class MyLocationListener implements LocationListener {
 
 		// Send location data to server
 		updateUserLocation();
+		
+		// TODO: Move to BusClient
+		for(Bus bus : busList) {
+			updateBusLocation(bus);
+		}
 
 		// TODO: This function should be called separately in regular intervals
 		// NOTE: In this prototype, the user location is perceived as a bus.
