@@ -20,6 +20,11 @@ public class BusAppActivity extends MapActivity {
 
 	private LocationManager locManager = null;
 	private LocationListener locListener = null;
+
+	/**
+	 * Text view where user sees all information such as latitude, longitude,
+	 * and instructions
+	 */
 	private TextView display = null;
 
 	/** Called when the activity is first created. */
