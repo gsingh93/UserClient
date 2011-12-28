@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<route>
+	<name>North Commuter</name>
+	<lat>80</lat>
+	<lon>40</lon>
+	<stop>
+		<name>Stop1</name>
+		<distance>1</distance>
+		<time>1</time>
+	</stop>
+	<stop>
+		<name>Stop2</name>
+		<distance>1</distance>
+		<time>1</time>
+	</stop>
+		<stop>
+		<name>Stop3</name>
+		<distance>1</distance>
+		<time>1</time>
+	</stop>
+</route>
