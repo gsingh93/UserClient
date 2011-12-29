@@ -70,6 +70,8 @@ public class MyLocationListener implements LocationListener {
 		List<String> stopNames = new LinkedList<String>();
 
 		stopNames.add("Stop1");
+		stopNames.add("Stop2");
+		stopNames.add("Stop3");
 
 		initBus("North Commuter", stopNames);
 
@@ -83,7 +85,7 @@ public class MyLocationListener implements LocationListener {
 	private void updateBusLocation(Bus bus) {
 		
 		// TODO: Add route name
-		// Location POST URL
+		// Location GET URL
 		URLText = String
 				.format("http://michigangurudwara.com/bus.php?routeName=%s&lat=%f&lon=%f",
 						bus.getName(), lat, lon);
@@ -95,10 +97,9 @@ public class MyLocationListener implements LocationListener {
 		int i = 0;
 		StringBuilder sb = new StringBuilder(URLText);
 		for (String name : stopNames) {
-			sb.append("&name[").append(i).append("]=").append(name);
-			sb.append("&time[").append(i).append("]=").append(times.get(i));
-			sb.append("&distance[").append(i).append("]=")
-					.append(distances.get(i));
+			sb.append("&name[]=").append(name);
+			sb.append("&time[]=").append(times.get(i));
+			sb.append("&distance[]=").append(distances.get(i));
 			i++;
 		}
 		
@@ -112,7 +113,7 @@ public class MyLocationListener implements LocationListener {
 		DefaultHttpClient hc = new DefaultHttpClient();
 		HttpPost postMethod = new HttpPost(URLText);
 
-		// POST data
+		// Send data
 		try {
 			hc.execute(postMethod);
 		} catch (UnsupportedEncodingException e) {
@@ -143,7 +144,7 @@ public class MyLocationListener implements LocationListener {
 	// perceived as a bus.
 	private void updateUserLocation() {
 		// TODO: Add route name
-		// Location POST URL
+		// Location GET URL
 		URLText = "http://michigangurudwara.com/bus.php?lat=" + lat + "&lon="
 				+ lon;
 
@@ -151,7 +152,7 @@ public class MyLocationListener implements LocationListener {
 		DefaultHttpClient hc = new DefaultHttpClient();
 		HttpPost postMethod = new HttpPost(URLText);
 
-		// POST data
+		// Send data
 		try {
 			hc.execute(postMethod);
 		} catch (UnsupportedEncodingException e) {
@@ -192,7 +193,7 @@ public class MyLocationListener implements LocationListener {
 							.getFirstChild().getNodeValue();
 
 					for (Bus bus : busList) {
-						if (bus.getName() == name) {
+						if (bus.getName().equals(name)) {
 							bus.setPos(
 									Double.valueOf(route
 											.getElementsByTagName("lat")
@@ -203,10 +204,10 @@ public class MyLocationListener implements LocationListener {
 											.item(0).getFirstChild()
 											.getNodeValue()));
 
-							NodeList sl = route.getElementsByTagName("Stop");
+							NodeList sl = route.getElementsByTagName("stop");
 
 							if (sl != null && sl.getLength() > 0) {
-								for (int j = 0; j < nl.getLength(); j++) {
+								for (int j = 0; j < sl.getLength(); j++) {
 									Element stopEl = (Element) sl.item(j);
 									String stopName = stopEl
 											.getElementsByTagName("name")
@@ -214,7 +215,7 @@ public class MyLocationListener implements LocationListener {
 											.getNodeValue();
 
 									for (Stop stop : bus.getStops()) {
-										if (stopName == stop.getName()) {
+										if (stopName.equals(stop.getName())) {
 
 											stop.setArrivalInfo(
 													Double.valueOf(stopEl
@@ -290,6 +291,10 @@ public class MyLocationListener implements LocationListener {
 		// This eliminates the need of having another client broadcasting it's
 		// position
 		retreiveBusLocation();
+		
+		for (Bus bus : busList) {
+			
+		}
 	}
 
 	@Override
