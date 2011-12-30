@@ -16,18 +16,22 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
+
+import com.google.android.maps.GeoPoint;
+import com.google.android.maps.MapView;
+import com.google.android.maps.Overlay;
+import com.google.android.maps.OverlayItem;
 
 public class MyLocationListener implements LocationListener {
 
@@ -45,6 +49,7 @@ public class MyLocationListener implements LocationListener {
 	 * Information TextView
 	 */
 	TextView display = null;
+	MapView mapView = null;
 
 	/**
 	 * Latitude of user
@@ -61,9 +66,12 @@ public class MyLocationListener implements LocationListener {
 	 */
 	private List<Bus> busList = new LinkedList<Bus>();
 
-	MyLocationListener(TextView display) {
+	Drawable drawable = null;
+	MyLocationListener(TextView display, MapView mapView, Drawable drawable) {
 		super();
 		this.display = display;
+		this.mapView = mapView;
+		this.drawable = drawable;
 
 		// TODO: Get all buses from XML file
 		// Initialize all buses
@@ -90,6 +98,19 @@ public class MyLocationListener implements LocationListener {
 		// Display location
 		display.setText(Text
 				+ "\n\nCheck http://michigangurudwara.com/bus.php to see your location");
+
+		List<Overlay> mapOverlays = mapView.getOverlays();
+
+		MyItemizedOverlay itemizedOverlay = new MyItemizedOverlay(drawable);
+
+		GeoPoint point = new GeoPoint((int) (lat * 1E6), (int) (lon * 1E6));
+		OverlayItem overlayItem = new OverlayItem(point, "", "");
+
+
+		itemizedOverlay.addOverlay(overlayItem);
+		mapOverlays.add(itemizedOverlay);
+
+		Log.d("tag", "done");
 	}
 
 	// NOTE: This should be in BusClient. UserClient should only store location
@@ -101,23 +122,16 @@ public class MyLocationListener implements LocationListener {
 		URLText = "http://michigangurudwara.com/bus.php?lat=" + lat + "&lon="
 				+ lon;
 
-		// Initialize HTTP objects
-		DefaultHttpClient hc = new DefaultHttpClient();
-		HttpPost postMethod = new HttpPost(URLText);
+		mapView.setBuiltInZoomControls(true);
+		List<Overlay> mapOverlays = mapView.getOverlays();
 
-		// Send data
-		try {
-			hc.execute(postMethod);
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClientProtocolException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		MyItemizedOverlay itemizedOverlay = new MyItemizedOverlay(drawable);
+
+		GeoPoint point = new GeoPoint((int) (lat * 1E6), (int) (lon * 1E6));
+		OverlayItem overlayItem = new OverlayItem(point, "", "");
+
+		itemizedOverlay.addOverlay(overlayItem);
+		mapOverlays.add(itemizedOverlay);
 	}
 
 	private void retreiveBusLocation() {
@@ -234,11 +248,6 @@ public class MyLocationListener implements LocationListener {
 		// Send location data to server
 		updateUserLocation();
 		
-		// TODO: Move to BusClient
-		for(Bus bus : busList) {
-			updateBusLocation(bus);
-		}
-
 		// TODO: This function should be called separately in regular intervals
 		// NOTE: In this prototype, the user location is perceived as a bus.
 		// This eliminates the need of having another client broadcasting it's
