@@ -1,7 +1,11 @@
 package gsingh.busapp.userclient;
 
 import gsingh.busapp.R;
+
+import java.util.List;
+
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -9,6 +13,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.maps.MapActivity;
+import com.google.android.maps.MapView;
+import com.google.android.maps.Overlay;
 
 /*
  * To test in the emulator, use the telnet commands:
@@ -16,7 +22,7 @@ import com.google.android.maps.MapActivity;
  * geo fix 30.0 30.0
  */
 
-public class BusAppActivity extends MapActivity {
+public class UserClientActivity extends MapActivity {
 
 	private LocationManager locManager = null;
 	private LocationListener locListener = null;
@@ -27,12 +33,24 @@ public class BusAppActivity extends MapActivity {
 	 */
 	private TextView display = null;
 
+	private MapView mapView = null;
+
+	List<Overlay> mapOverlays;
+	Drawable drawable;
+	MyItemizedOverlay itemizedOverlay;
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		display = (TextView) findViewById(R.id.textview);
+		mapView = (MapView) findViewById(R.id.mapview);
+
+		mapView.setBuiltInZoomControls(true);
+		mapOverlays = mapView.getOverlays();
+		drawable = this.getResources().getDrawable(R.drawable.androidmarker);
+		itemizedOverlay = new MyItemizedOverlay(drawable);
 
 		/* Use the LocationManager class to obtain GPS locations */
 		locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);

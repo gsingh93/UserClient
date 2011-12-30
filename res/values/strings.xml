@@ -2,6 +2,6 @@
 <resources>
 
     <string name="hello">Hello World, BusAppActivity!</string>
-    <string name="app_name">BusApp</string>
+    <string name="app_name">UserClient</string>
 
 </resources>

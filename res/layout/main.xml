@@ -29,6 +29,8 @@
         android:layout_height="wrap_content"
         android:text="Click the locate button to find position" />
     
-    <com.google.android.maps.MapView style="@style/MapStyle" /> 
+    <com.google.android.maps.MapView
+        android:id="@+id/mapview"
+        style="@style/MapStyle" /> 
 
 </LinearLayout> 
