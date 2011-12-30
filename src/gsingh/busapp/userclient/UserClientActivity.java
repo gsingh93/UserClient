@@ -12,9 +12,11 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
+import com.google.android.maps.OverlayItem;
 
 /*
  * To test in the emulator, use the telnet commands:
@@ -51,6 +53,12 @@ public class UserClientActivity extends MapActivity {
 		mapOverlays = mapView.getOverlays();
 		drawable = this.getResources().getDrawable(R.drawable.androidmarker);
 		itemizedOverlay = new MyItemizedOverlay(drawable);
+
+		GeoPoint point = new GeoPoint(19240000,-99120000);
+		OverlayItem overlayItem = new OverlayItem(point, "", "");
+
+		itemizedOverlay.addOverlay(overlayItem);
+		mapOverlays.add(itemizedOverlay);
 
 		/* Use the LocationManager class to obtain GPS locations */
 		locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);

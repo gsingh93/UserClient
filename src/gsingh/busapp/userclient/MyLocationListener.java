@@ -82,53 +82,6 @@ public class MyLocationListener implements LocationListener {
 		busList.add(bus);
 	}
 
-	private void updateBusLocation(Bus bus) {
-		
-		// TODO: Add route name
-		// Location GET URL
-		URLText = String
-				.format("http://michigangurudwara.com/bus.php?routeName=%s&lat=%f&lon=%f",
-						bus.getName(), lat, lon);
-
-		List<String> stopNames = bus.getStopNames();
-		List<Double> times = bus.getStopTimes();
-		List<Double> distances = bus.getStopDistances();
-
-		int i = 0;
-		StringBuilder sb = new StringBuilder(URLText);
-		for (String name : stopNames) {
-			sb.append("&name[]=").append(name);
-			sb.append("&time[]=").append(times.get(i));
-			sb.append("&distance[]=").append(distances.get(i));
-			i++;
-		}
-		
-		URLText = sb.toString();
-		
-		URLText = URLText.replace(" ", "%20");
-		
-		Log.d("tag", URLText);
-
-		// Initialize HTTP objects
-		DefaultHttpClient hc = new DefaultHttpClient();
-		HttpPost postMethod = new HttpPost(URLText);
-
-		// Send data
-		try {
-			hc.execute(postMethod);
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClientProtocolException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-
 	private void updateScreenText() {
 		// Create text to be displayed on screen
 		String Text = "My current location is: " + "\nLatitude = " + lat
