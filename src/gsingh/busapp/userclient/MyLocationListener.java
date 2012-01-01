@@ -130,27 +130,50 @@ public class MyLocationListener implements LocationListener {
 				(int) (-83.7431708 * 1E6));
 		mapController.setCenter(center);
 
-		// TODO: Get all buses from XML file
-		// Initialize all buses
-
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-
-		// Send XMLs
+		// Initialize all buses by getting route and stop names from XML file
 		try {
-			String s;
+			// Setup HTTP connection to XML file
 			URL url;
-
 			url = new URL("http://michigangurudwara.com/coord.xml");
+			InputStream URLStream = url.openStream();
 
-			InputStream URLStream2 = url.openStream();
-
+			// Retrieve DOM from XML file
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			DocumentBuilder db = dbf.newDocumentBuilder();
-			Document dom = db.parse(URLStream2);
+			Document dom = db.parse(URLStream);
 
 			Element docEl = dom.getDocumentElement();
 
+			// Get all routes from XML file
 			NodeList nl = docEl.getElementsByTagName("route");
 
+			String routeName = null;
+			NodeList sl = null;
+			List<String> stopNames = new LinkedList<String>();
+
+			// For each route, get all stops
+			if (nl != null && nl.getLength() > 0) {
+				for (int i = 0; i < nl.getLength(); i++) {
+					Element route = (Element) nl.item(i);
+
+					routeName = route.getElementsByTagName("name").item(0)
+							.getFirstChild().getNodeValue();
+
+					// For each stop, get the stop name and add it to the list
+					sl = route.getElementsByTagName("stop");
+					if (sl != null && sl.getLength() > 0) {
+						for (int j = 0; i < sl.getLength(); j++) {
+							Element stop = (Element) sl.item(j);
+
+							stopNames.add(stop.getElementsByTagName("name")
+									.item(0).getFirstChild().getNodeValue());
+						}
+					}
+
+					// Initialize the bus with the route name and stop list
+					initBus(routeName, stopNames);
+				}
+			}
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -164,15 +187,6 @@ public class MyLocationListener implements LocationListener {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		List<String> stopNames = new LinkedList<String>();
-
-		stopNames.add("Stop1");
-		stopNames.add("Stop2");
-		stopNames.add("Stop3");
-
-		initBus("North Commuter", stopNames);
-
 	}
 
 	private void initBus(String name, List<String> stopNames) {
