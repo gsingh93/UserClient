@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,6 +32,7 @@ import android.util.Log;
 import android.widget.TextView;
 
 import com.google.android.maps.GeoPoint;
+import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
@@ -48,10 +50,35 @@ public class MyLocationListener implements LocationListener {
 	String URLText = null;
 
 	/**
-	 * Information TextView
+	 * Text view where user sees all information such as latitude, longitude,
+	 * and instructions
 	 */
-	TextView display = null;
-	MapView mapView = null;
+	private TextView display = null;
+
+	/**
+	 * Map view where user and bus locations will be displayed
+	 */
+	private MapView mapView = null;
+
+	/**
+	 * Map view controller
+	 */
+	private MapController mapController = null;
+
+	/**
+	 * List of overlays on map
+	 */
+	List<Overlay> mapOverlays = null;
+
+	/**
+	 * User overlay items.
+	 */
+	MyItemizedOverlay userMarkerOverlay = null;
+
+	/**
+	 * Bus overlay items.
+	 */
+	MyItemizedOverlay busMarkerOverlay = null;
 
 	/**
 	 * Latitude of user
@@ -68,17 +95,76 @@ public class MyLocationListener implements LocationListener {
 	 */
 	private List<Bus> busList = new LinkedList<Bus>();
 
-	Drawable drawable = null;
+	/**
+	 * Image displayed at user position
+	 */
+	Drawable userMarker;
+
+	/**
+	 * Image displayed at bus position
+	 */
+	Drawable busMarker;
 
 	MyLocationListener(Activity activity) {
 		super();
 		this.display = (TextView) activity.findViewById(R.id.textview);
 		this.mapView = (MapView) activity.findViewById(R.id.mapview);
-		this.drawable = activity.getResources().getDrawable(
-				R.drawable.androidmarker);
+		this.userMarker = activity.getResources().getDrawable(
+				R.drawable.usermarker);
+		this.busMarker = activity.getResources().getDrawable(
+				R.drawable.busmarker);
+
+		// Get MapController
+		mapController = mapView.getController();
+
+		// Get list of overlays on map
+		mapOverlays = mapView.getOverlays();
+		userMarkerOverlay = new MyItemizedOverlay(userMarker);
+		busMarkerOverlay = new MyItemizedOverlay(busMarker);
+
+		// Set up mapview default settings
+		// TODO: Set center to correct location
+		mapView.setBuiltInZoomControls(true);
+		mapController.setZoom(16);
+		GeoPoint center = new GeoPoint((int) (42.2761137 * 1E6),
+				(int) (-83.7431708 * 1E6));
+		mapController.setCenter(center);
 
 		// TODO: Get all buses from XML file
 		// Initialize all buses
+
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
+		// Send XMLs
+		try {
+			String s;
+			URL url;
+
+			url = new URL("http://michigangurudwara.com/coord.xml");
+
+			InputStream URLStream2 = url.openStream();
+
+			DocumentBuilder db = dbf.newDocumentBuilder();
+			Document dom = db.parse(URLStream2);
+
+			Element docEl = dom.getDocumentElement();
+
+			NodeList nl = docEl.getElementsByTagName("route");
+
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		List<String> stopNames = new LinkedList<String>();
 
 		stopNames.add("Stop1");
@@ -102,39 +188,14 @@ public class MyLocationListener implements LocationListener {
 		// Display location
 		display.setText(Text
 				+ "\n\nCheck http://michigangurudwara.com/bus.php to see your location");
-
-		List<Overlay> mapOverlays = mapView.getOverlays();
-
-		MyItemizedOverlay itemizedOverlay = new MyItemizedOverlay(drawable);
-
-		GeoPoint point = new GeoPoint((int) (lat * 1E6), (int) (lon * 1E6));
-		OverlayItem overlayItem = new OverlayItem(point, "", "");
-
-		itemizedOverlay.addOverlay(overlayItem);
-		mapOverlays.add(itemizedOverlay);
-
-		Log.d("tag", "done");
 	}
 
-	// NOTE: This should be in BusClient. UserClient should only store location
-	// locally, not send it to server. In this prototype, user location
-	// perceived as a bus.
 	private void updateUserLocation() {
-		// TODO: Add route name
-		// Location GET URL
-		URLText = "http://michigangurudwara.com/bus.php?lat=" + lat + "&lon="
-				+ lon;
-
-		mapView.setBuiltInZoomControls(true);
-		List<Overlay> mapOverlays = mapView.getOverlays();
-
-		MyItemizedOverlay itemizedOverlay = new MyItemizedOverlay(drawable);
-
 		GeoPoint point = new GeoPoint((int) (lat * 1E6), (int) (lon * 1E6));
 		OverlayItem overlayItem = new OverlayItem(point, "", "");
 
-		itemizedOverlay.addOverlay(overlayItem);
-		mapOverlays.add(itemizedOverlay);
+		userMarkerOverlay.addOverlay(overlayItem);
+		mapOverlays.add(userMarkerOverlay);
 	}
 
 	private void retreiveBusLocation() {
@@ -248,13 +309,11 @@ public class MyLocationListener implements LocationListener {
 		// Update text on the screen
 		updateScreenText();
 
-		// Send location data to server
+		// Update user location on map view
 		updateUserLocation();
 
 		// TODO: This function should be called separately in regular intervals
-		// NOTE: In this prototype, the user location is perceived as a bus.
-		// This eliminates the need of having another client broadcasting it's
-		// position
+		// or wait until one bus location changes
 		retreiveBusLocation();
 
 		for (Bus bus : busList) {
