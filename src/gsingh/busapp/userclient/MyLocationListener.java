@@ -7,8 +7,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -45,16 +47,6 @@ public class MyLocationListener implements LocationListener {
 	private final String FILENAME = "/coord.xml";
 
 	/**
-	 * URL object of server
-	 */
-	URL url;
-
-	/**
-	 * Address of server
-	 */
-	String URLText = null;
-
-	/**
 	 * Text view where user sees all information such as latitude, longitude,
 	 * and instructions
 	 */
@@ -86,19 +78,14 @@ public class MyLocationListener implements LocationListener {
 	MyItemizedOverlay busMarkerOverlay = null;
 
 	/**
-	 * Latitude of user
-	 */
-	double lat;
-
-	/**
-	 * Longitude of user
-	 */
-	double lon;
-
-	/**
 	 * List of all buses/routes in XML file
 	 */
 	private List<Bus> busList = new LinkedList<Bus>();
+
+	/**
+	 * Map of bus/route name to bus object
+	 */
+	private Map<String, Bus> busMap = new HashMap<String, Bus>();
 
 	/**
 	 * Image displayed at user position
@@ -109,6 +96,16 @@ public class MyLocationListener implements LocationListener {
 	 * Image displayed at bus position
 	 */
 	Drawable busMarker;
+
+	/**
+	 * Latitude of user
+	 */
+	double lat;
+
+	/**
+	 * Longitude of user
+	 */
+	double lon;
 
 	MyLocationListener(Activity activity) {
 		super();
@@ -171,6 +168,7 @@ public class MyLocationListener implements LocationListener {
 
 	private void initBus(String name, List<String> stopNames) {
 		Bus bus = new Bus(name, stopNames);
+		busMap.put(name, bus);
 		busList.add(bus);
 	}
 
@@ -225,60 +223,48 @@ public class MyLocationListener implements LocationListener {
 		mapOverlays.add(userMarkerOverlay);
 	}
 
+	/**
+	 * Gets coordinates for all buses
+	 */
 	private void retreiveBusLocation() {
-		// TODO: Get list of buses
-
-		// Send XML
-
+		// Get list of buses/routes
 		NodeList nl = getRouteList();
 
 		if (nl != null && nl.getLength() > 0) {
 			for (int i = 0; i < nl.getLength(); i++) {
-				Element route = (Element) nl.item(i);
-				String name = route.getElementsByTagName("name").item(0)
+				Element routeEl = (Element) nl.item(i);
+				String name = routeEl.getElementsByTagName("name").item(0)
 						.getFirstChild().getNodeValue();
 
-				for (Bus bus : busList) {
-					if (bus.getName().equals(name)) {
-						bus.setPos(
-								Double.valueOf(route
-										.getElementsByTagName("lat").item(0)
+				Bus bus = (Bus) busMap.get(name);
+
+				bus.setPos(
+						Double.valueOf(routeEl.getElementsByTagName("lat")
+								.item(0).getFirstChild().getNodeValue()),
+						Double.valueOf(routeEl.getElementsByTagName("lon")
+								.item(0).getFirstChild().getNodeValue()));
+
+				NodeList sl = routeEl.getElementsByTagName("stop");
+
+				if (sl != null && sl.getLength() > 0) {
+					for (int j = 0; j < sl.getLength(); j++) {
+						Element stopEl = (Element) sl.item(j);
+
+						String stopName = stopEl.getElementsByTagName("name")
+								.item(0).getFirstChild().getNodeValue();
+
+						Stop stop = bus.getStop(stopName);
+
+						stop.setArrivalInfo(
+								Double.valueOf(stopEl
+										.getElementsByTagName("time").item(0)
 										.getFirstChild().getNodeValue()),
-								Double.valueOf(route
-										.getElementsByTagName("lon").item(0)
-										.getFirstChild().getNodeValue()));
+								Double.valueOf(stopEl
+										.getElementsByTagName("distance")
+										.item(0).getFirstChild().getNodeValue()));
 
-						NodeList sl = route.getElementsByTagName("stop");
-
-						if (sl != null && sl.getLength() > 0) {
-							for (int j = 0; j < sl.getLength(); j++) {
-								Element stopEl = (Element) sl.item(j);
-								String stopName = stopEl
-										.getElementsByTagName("name").item(0)
-										.getFirstChild().getNodeValue();
-
-								for (Stop stop : bus.getStops()) {
-									if (stopName.equals(stop.getName())) {
-
-										stop.setArrivalInfo(
-												Double.valueOf(stopEl
-														.getElementsByTagName(
-																"time").item(0)
-														.getFirstChild()
-														.getNodeValue()),
-												Double.valueOf(stopEl
-														.getElementsByTagName(
-																"distance")
-														.item(0)
-														.getFirstChild()
-														.getNodeValue()));
-									}
-								}
-							}
-						}
 					}
 				}
-
 			}
 		}
 
@@ -313,10 +299,6 @@ public class MyLocationListener implements LocationListener {
 		// TODO: This function should be called separately in regular intervals
 		// or wait until one bus location changes
 		retreiveBusLocation();
-
-		for (Bus bus : busList) {
-
-		}
 	}
 
 	@Override

@@ -1,7 +1,9 @@
 package gsingh.busapp.userclient;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class Bus {
 
@@ -38,7 +40,7 @@ public class Bus {
 		public double getArrivalDistance() {
 			return arrivalDistance;
 		}
-		
+
 		public void setArrivalInfo(double time, double distance) {
 			arrivalTime = time;
 			arrivalDistance = distance;
@@ -51,28 +53,32 @@ public class Bus {
 	private double lon;
 
 	private List<Stop> stopList = new LinkedList<Stop>();
-	
+
+	private Map<String, Stop> stopMap = new HashMap<String, Stop>();
+
 	Bus(String name, List<String> stopNames) {
 		this.name = name;
 
 		for (String stopName : stopNames) {
-			this.stopList.add(new Stop(stopName));
+			Stop stop = new Stop(stopName);
+			this.stopList.add(stop);
+			stopMap.put(stopName, stop);
 		}
 	}
 
 	public String getName() {
 		return name;
 	}
-	
+
 	public double[] getPos() {
 		return new double[] { lat, lon };
 	}
-	
+
 	public void setPos(double lat, double lon) {
 		this.lat = lat;
 		this.lon = lon;
 	}
-	
+
 	public List<String> getStopNames() {
 		List<String> stopNames = new LinkedList<String>();
 		for (Stop stop : stopList) {
@@ -96,8 +102,12 @@ public class Bus {
 		}
 		return stopDistances;
 	}
-	
+
 	public List<Stop> getStops() {
 		return stopList;
+	}
+
+	public Stop getStop(String stopName) {
+		return stopMap.get(stopName);
 	}
 }
