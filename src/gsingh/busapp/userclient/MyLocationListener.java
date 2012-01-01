@@ -3,11 +3,8 @@ package gsingh.busapp.userclient;
 import gsingh.busapp.R;
 import gsingh.busapp.userclient.Bus.Stop;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.LinkedList;
@@ -17,7 +14,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.http.client.ClientProtocolException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -28,7 +24,6 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.TextView;
 
 import com.google.android.maps.GeoPoint;
@@ -38,6 +33,16 @@ import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
 
 public class MyLocationListener implements LocationListener {
+
+	/**
+	 * Server name
+	 */
+	private final String SERVERNAME = "http://michigangurudwara.com";
+
+	/**
+	 * XML file name
+	 */
+	private final String FILENAME = "/coord.xml";
 
 	/**
 	 * URL object of server
@@ -131,10 +136,50 @@ public class MyLocationListener implements LocationListener {
 		mapController.setCenter(center);
 
 		// Initialize all buses by getting route and stop names from XML file
+
+		// Get all routes from XML file
+		NodeList nl = getRouteList();
+
+		String routeName = null;
+		NodeList sl = null;
+		List<String> stopNames = new LinkedList<String>();
+
+		// For each route, get all stops
+		if (nl != null && nl.getLength() > 0) {
+			for (int i = 0; i < nl.getLength(); i++) {
+				Element route = (Element) nl.item(i);
+
+				routeName = route.getElementsByTagName("name").item(0)
+						.getFirstChild().getNodeValue();
+
+				// For each stop, get the stop name and add it to the list
+				sl = route.getElementsByTagName("stop");
+				if (sl != null && sl.getLength() > 0) {
+					for (int j = 0; i < sl.getLength(); j++) {
+						Element stop = (Element) sl.item(j);
+
+						stopNames.add(stop.getElementsByTagName("name").item(0)
+								.getFirstChild().getNodeValue());
+					}
+				}
+
+				// Initialize the bus with the route name and stop list
+				initBus(routeName, stopNames);
+			}
+		}
+	}
+
+	private void initBus(String name, List<String> stopNames) {
+		Bus bus = new Bus(name, stopNames);
+		busList.add(bus);
+	}
+
+	private NodeList getRouteList() {
+		// Setup HTTP connection to XML file
+		URL url;
+		NodeList nl = null;
 		try {
-			// Setup HTTP connection to XML file
-			URL url;
-			url = new URL("http://michigangurudwara.com/coord.xml");
+			url = new URL(SERVERNAME + FILENAME);
 			InputStream URLStream = url.openStream();
 
 			// Retrieve DOM from XML file
@@ -144,36 +189,7 @@ public class MyLocationListener implements LocationListener {
 
 			Element docEl = dom.getDocumentElement();
 
-			// Get all routes from XML file
-			NodeList nl = docEl.getElementsByTagName("route");
-
-			String routeName = null;
-			NodeList sl = null;
-			List<String> stopNames = new LinkedList<String>();
-
-			// For each route, get all stops
-			if (nl != null && nl.getLength() > 0) {
-				for (int i = 0; i < nl.getLength(); i++) {
-					Element route = (Element) nl.item(i);
-
-					routeName = route.getElementsByTagName("name").item(0)
-							.getFirstChild().getNodeValue();
-
-					// For each stop, get the stop name and add it to the list
-					sl = route.getElementsByTagName("stop");
-					if (sl != null && sl.getLength() > 0) {
-						for (int j = 0; i < sl.getLength(); j++) {
-							Element stop = (Element) sl.item(j);
-
-							stopNames.add(stop.getElementsByTagName("name")
-									.item(0).getFirstChild().getNodeValue());
-						}
-					}
-
-					// Initialize the bus with the route name and stop list
-					initBus(routeName, stopNames);
-				}
-			}
+			nl = docEl.getElementsByTagName("route");
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -187,11 +203,8 @@ public class MyLocationListener implements LocationListener {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
 
-	private void initBus(String name, List<String> stopNames) {
-		Bus bus = new Bus(name, stopNames);
-		busList.add(bus);
+		return nl;
 	}
 
 	private void updateScreenText() {
@@ -213,106 +226,77 @@ public class MyLocationListener implements LocationListener {
 	}
 
 	private void retreiveBusLocation() {
-
 		// TODO: Get list of buses
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
 		// Send XML
-		try {
-			String s;
-			URL url = new URL("http://michigangurudwara.com/coord.xml");
 
-			InputStream URLStream2 = url.openStream();
+		NodeList nl = getRouteList();
 
-			DocumentBuilder db = dbf.newDocumentBuilder();
-			Document dom = db.parse(URLStream2);
+		if (nl != null && nl.getLength() > 0) {
+			for (int i = 0; i < nl.getLength(); i++) {
+				Element route = (Element) nl.item(i);
+				String name = route.getElementsByTagName("name").item(0)
+						.getFirstChild().getNodeValue();
 
-			Element docEl = dom.getDocumentElement();
+				for (Bus bus : busList) {
+					if (bus.getName().equals(name)) {
+						bus.setPos(
+								Double.valueOf(route
+										.getElementsByTagName("lat").item(0)
+										.getFirstChild().getNodeValue()),
+								Double.valueOf(route
+										.getElementsByTagName("lon").item(0)
+										.getFirstChild().getNodeValue()));
 
-			NodeList nl = docEl.getElementsByTagName("route");
+						NodeList sl = route.getElementsByTagName("stop");
 
-			if (nl != null && nl.getLength() > 0) {
-				for (int i = 0; i < nl.getLength(); i++) {
-					Element route = (Element) nl.item(i);
-					String name = route.getElementsByTagName("name").item(0)
-							.getFirstChild().getNodeValue();
+						if (sl != null && sl.getLength() > 0) {
+							for (int j = 0; j < sl.getLength(); j++) {
+								Element stopEl = (Element) sl.item(j);
+								String stopName = stopEl
+										.getElementsByTagName("name").item(0)
+										.getFirstChild().getNodeValue();
 
-					for (Bus bus : busList) {
-						if (bus.getName().equals(name)) {
-							bus.setPos(
-									Double.valueOf(route
-											.getElementsByTagName("lat")
-											.item(0).getFirstChild()
-											.getNodeValue()),
-									Double.valueOf(route
-											.getElementsByTagName("lon")
-											.item(0).getFirstChild()
-											.getNodeValue()));
+								for (Stop stop : bus.getStops()) {
+									if (stopName.equals(stop.getName())) {
 
-							NodeList sl = route.getElementsByTagName("stop");
-
-							if (sl != null && sl.getLength() > 0) {
-								for (int j = 0; j < sl.getLength(); j++) {
-									Element stopEl = (Element) sl.item(j);
-									String stopName = stopEl
-											.getElementsByTagName("name")
-											.item(0).getFirstChild()
-											.getNodeValue();
-
-									for (Stop stop : bus.getStops()) {
-										if (stopName.equals(stop.getName())) {
-
-											stop.setArrivalInfo(
-													Double.valueOf(stopEl
-															.getElementsByTagName(
-																	"time")
-															.item(0)
-															.getFirstChild()
-															.getNodeValue()),
-													Double.valueOf(stopEl
-															.getElementsByTagName(
-																	"distance")
-															.item(0)
-															.getFirstChild()
-															.getNodeValue()));
-										}
+										stop.setArrivalInfo(
+												Double.valueOf(stopEl
+														.getElementsByTagName(
+																"time").item(0)
+														.getFirstChild()
+														.getNodeValue()),
+												Double.valueOf(stopEl
+														.getElementsByTagName(
+																"distance")
+														.item(0)
+														.getFirstChild()
+														.getNodeValue()));
 									}
 								}
 							}
 						}
 					}
-
 				}
+
 			}
-
-			InputStream URLStream1 = url.openStream();
-			InputStreamReader isr = new InputStreamReader(URLStream1);
-			BufferedReader br = new BufferedReader(isr);
-
-			while ((s = br.readLine()) != null) {
-				Log.d("tag1", String.valueOf(s));
-			}
-
-			/*
-			 * String response = hc.execute(postMethod, handler); Log.d("tag",
-			 * response);
-			 */
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClientProtocolException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
+
+		/*
+		 * String s;
+		 * 
+		 * InputStream URLStream1 = url.openStream(); InputStreamReader isr =
+		 * new InputStreamReader(URLStream1); BufferedReader br = new
+		 * BufferedReader(isr);
+		 * 
+		 * while ((s = br.readLine()) != null) { Log.d("tag1",
+		 * String.valueOf(s)); }
+		 */
+
+		/*
+		 * String response = hc.execute(postMethod, handler); Log.d("tag",
+		 * response);
+		 */
 	}
 
 	@Override
