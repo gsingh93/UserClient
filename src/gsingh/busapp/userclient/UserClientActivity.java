@@ -51,10 +51,10 @@ public class UserClientActivity extends MapActivity {
 
 		mapView.setBuiltInZoomControls(true);
 		mapOverlays = mapView.getOverlays();
-		drawable = this.getResources().getDrawable(R.drawable.androidmarker);
 		itemizedOverlay = new MyItemizedOverlay(drawable);
 
-		GeoPoint center = new GeoPoint((int)(42.2761137*1E6), (int)(-83.7431708*1E6));
+		GeoPoint center = new GeoPoint((int) (42.2761137 * 1E6),
+				(int) (-83.7431708 * 1E6));
 		mapView.getController().setCenter(center);
 		mapView.getController().setZoom(16);
 		OverlayItem overlayItem = new OverlayItem(center, "", "");
@@ -65,8 +65,7 @@ public class UserClientActivity extends MapActivity {
 		/* Use the LocationManager class to obtain GPS locations */
 		locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-		// TODO: Only pass context
-		locListener = new MyLocationListener(display, mapView, drawable);
+		locListener = new MyLocationListener(this);
 	}
 
 	public void onClickLocate(View v) {

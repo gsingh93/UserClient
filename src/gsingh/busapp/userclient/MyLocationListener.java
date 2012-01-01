@@ -1,5 +1,6 @@
 package gsingh.busapp.userclient;
 
+import gsingh.busapp.R;
 import gsingh.busapp.userclient.Bus.Stop;
 
 import java.io.BufferedReader;
@@ -21,6 +22,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import android.app.Activity;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
@@ -44,7 +46,7 @@ public class MyLocationListener implements LocationListener {
 	 * Address of server
 	 */
 	String URLText = null;
-	
+
 	/**
 	 * Information TextView
 	 */
@@ -67,11 +69,13 @@ public class MyLocationListener implements LocationListener {
 	private List<Bus> busList = new LinkedList<Bus>();
 
 	Drawable drawable = null;
-	MyLocationListener(TextView display, MapView mapView, Drawable drawable) {
+
+	MyLocationListener(Activity activity) {
 		super();
-		this.display = display;
-		this.mapView = mapView;
-		this.drawable = drawable;
+		this.display = (TextView) activity.findViewById(R.id.textview);
+		this.mapView = (MapView) activity.findViewById(R.id.mapview);
+		this.drawable = activity.getResources().getDrawable(
+				R.drawable.androidmarker);
 
 		// TODO: Get all buses from XML file
 		// Initialize all buses
@@ -105,7 +109,6 @@ public class MyLocationListener implements LocationListener {
 
 		GeoPoint point = new GeoPoint((int) (lat * 1E6), (int) (lon * 1E6));
 		OverlayItem overlayItem = new OverlayItem(point, "", "");
-
 
 		itemizedOverlay.addOverlay(overlayItem);
 		mapOverlays.add(itemizedOverlay);
@@ -247,15 +250,15 @@ public class MyLocationListener implements LocationListener {
 
 		// Send location data to server
 		updateUserLocation();
-		
+
 		// TODO: This function should be called separately in regular intervals
 		// NOTE: In this prototype, the user location is perceived as a bus.
 		// This eliminates the need of having another client broadcasting it's
 		// position
 		retreiveBusLocation();
-		
+
 		for (Bus bus : busList) {
-			
+
 		}
 	}
 
