@@ -231,7 +231,6 @@ public class MyLocationListener implements LocationListener {
 		mapOverlays.add(userMarkerOverlay);
 		mapController.setCenter(point);
 
-		Log.d("tag", "before user invalidate");
 		mapView.invalidate();
 	}
 
@@ -299,6 +298,9 @@ public class MyLocationListener implements LocationListener {
 
 	public void updateBusLocation() {
 		busMarkerOverlay.clear();
+
+		mapOverlays.remove(busMarkerOverlay);
+
 		for (Bus bus : busList) {
 			GeoPoint point = new GeoPoint((int) (bus.getPos()[0] * 1E6),
 					(int) (bus.getPos()[1] * 1E6));
@@ -309,7 +311,7 @@ public class MyLocationListener implements LocationListener {
 			busMarkerOverlay.addOverlay(overlayItem);
 			mapOverlays.add(busMarkerOverlay);
 		}
-		Log.d("tag", "before invalidate");
+
 		mapView.invalidate();
 	}
 
