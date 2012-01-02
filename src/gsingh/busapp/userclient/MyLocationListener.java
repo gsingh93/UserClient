@@ -209,6 +209,7 @@ public class MyLocationListener implements LocationListener {
 	}
 
 	private void updateScreenText() {
+		// TODO: Use StringBuilder or format()
 		// Create text to be displayed on screen
 		String Text = "My current location is: " + "\nLatitude = " + lat
 				+ "\nLongitude = " + lon;
