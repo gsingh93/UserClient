@@ -26,6 +26,7 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.google.android.maps.GeoPoint;
@@ -151,8 +152,9 @@ public class MyLocationListener implements LocationListener {
 
 				// For each stop, get the stop name and add it to the list
 				sl = route.getElementsByTagName("stop");
+
 				if (sl != null && sl.getLength() > 0) {
-					for (int j = 0; i < sl.getLength(); j++) {
+					for (int j = 0; j < sl.getLength(); j++) {
 						Element stop = (Element) sl.item(j);
 
 						stopNames.add(stop.getElementsByTagName("name").item(0)
@@ -164,6 +166,7 @@ public class MyLocationListener implements LocationListener {
 				initBus(routeName, stopNames);
 			}
 		}
+
 	}
 
 	private void initBus(String name, List<String> stopNames) {
@@ -215,12 +218,21 @@ public class MyLocationListener implements LocationListener {
 				+ "\n\nCheck http://michigangurudwara.com/bus.php to see your location");
 	}
 
+	// TODO: Analyze both overlays
 	private void updateUserLocation() {
+		userMarkerOverlay.clear();
+
+		mapOverlays.remove(userMarkerOverlay);
+
 		GeoPoint point = new GeoPoint((int) (lat * 1E6), (int) (lon * 1E6));
 		OverlayItem overlayItem = new OverlayItem(point, "", "");
 
 		userMarkerOverlay.addOverlay(overlayItem);
 		mapOverlays.add(userMarkerOverlay);
+		mapController.setCenter(point);
+
+		Log.d("tag", "before user invalidate");
+		mapView.invalidate();
 	}
 
 	/**
@@ -285,6 +297,22 @@ public class MyLocationListener implements LocationListener {
 		 */
 	}
 
+	public void updateBusLocation() {
+		busMarkerOverlay.clear();
+		for (Bus bus : busList) {
+			GeoPoint point = new GeoPoint((int) (bus.getPos()[0] * 1E6),
+					(int) (bus.getPos()[1] * 1E6));
+			OverlayItem overlayItem = new OverlayItem(point, "", "");
+			Log.d("tag", String.valueOf(bus.getPos()[0]));
+			Log.d("tag", String.valueOf(bus.getPos()[1]));
+
+			busMarkerOverlay.addOverlay(overlayItem);
+			mapOverlays.add(busMarkerOverlay);
+		}
+		Log.d("tag", "before invalidate");
+		mapView.invalidate();
+	}
+
 	@Override
 	public void onLocationChanged(Location loc) {
 		lat = loc.getLatitude();
@@ -298,7 +326,11 @@ public class MyLocationListener implements LocationListener {
 
 		// TODO: This function should be called separately in regular intervals
 		// or wait until one bus location changes
+		// Gets bus locations for all buses
 		retreiveBusLocation();
+
+		// Update bus location on map view
+		updateBusLocation();
 	}
 
 	@Override

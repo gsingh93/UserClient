@@ -12,17 +12,8 @@ UserClient - Polls server for information for all routes
 		If route.name == routename;
 			Change Map Pos.
 			
-TODO:
-1. Successfully retreive bus (user) location from server
-2. Separate UserClient and BusClient
-3. Initialize buses from XML data
 
-At this point, the BusClient app should upload it's data (including new bus data)
-to the server and the server should format it into proper XML. The user can see
-his location on the UserClient app, as well as the locations of each registered
-bus. 
-
-4. Retreive bus info at regular intervals
+4. Retrieve bus info at regular intervals
 5. Have server calculate arrival distance/time and send to UserClient
 
 At this point, all that remains is to design the UserClient UI

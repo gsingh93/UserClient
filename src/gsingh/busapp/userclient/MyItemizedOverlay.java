@@ -8,7 +8,7 @@ import com.google.android.maps.ItemizedOverlay;
 import com.google.android.maps.OverlayItem;
 
 public class MyItemizedOverlay extends ItemizedOverlay<OverlayItem> {
-	
+
 	ArrayList<OverlayItem> overlays = new ArrayList<OverlayItem>();
 
 	public MyItemizedOverlay(Drawable defaultMarker) {
@@ -24,10 +24,14 @@ public class MyItemizedOverlay extends ItemizedOverlay<OverlayItem> {
 		overlays.add(overlay);
 		populate();
 	}
-	
+
 	@Override
 	public int size() {
 		return overlays.size();
+	}
+
+	public void clear() {
+		overlays.clear();
 	}
 
 }

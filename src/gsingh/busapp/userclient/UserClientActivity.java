@@ -41,8 +41,8 @@ public class UserClientActivity extends MapActivity {
 	}
 
 	public void onClickLocate(View v) {
-		locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0,
-				locListener);
+		locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000,
+				100, locListener);
 		display.setText("Locating...");
 	}
 
