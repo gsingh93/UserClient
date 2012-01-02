@@ -17,5 +17,7 @@ UserClient - Polls server for information for all routes
 5. Have server calculate arrival distance/time and send to UserClient
 6. Change GET to POST
 7. Add Route/Stop has been changed feature
+8. Add multiple threads
+9. Power management/location accuracy
 
 At this point, all that remains is to design the UserClient UI
