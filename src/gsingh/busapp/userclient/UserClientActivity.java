@@ -46,6 +46,10 @@ public class UserClientActivity extends MapActivity {
 		display.setText("Locating...");
 	}
 
+	public void onClickDrawRoute(View v) {
+		((MyLocationListener) locListener).drawRoute();
+	}
+
 	@Override
 	protected boolean isRouteDisplayed() {
 		// TODO Auto-generated method stub

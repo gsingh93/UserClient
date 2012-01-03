@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.google.android.maps.GeoPoint;
+
 public class Bus {
 
 	public class Stop {
@@ -24,8 +26,8 @@ public class Bus {
 			return name;
 		}
 
-		public double[] getPos() {
-			return new double[] { lat, lon };
+		public GeoPoint getPos() {
+			return new GeoPoint((int) (lat * 1E6), (int) (lon * 1E6));
 		}
 
 		public void setPos(double lat, double lon) {
@@ -56,13 +58,16 @@ public class Bus {
 
 	private Map<String, Stop> stopMap = new HashMap<String, Stop>();
 
-	Bus(String name, List<String> stopNames) {
+	Bus(String name, List<String> stopNames, List<double[]> stopPos) {
 		this.name = name;
 
+		int i = 0;
 		for (String stopName : stopNames) {
 			Stop stop = new Stop(stopName);
+			stop.setPos(stopPos.get(i)[0], stopPos.get(i)[1]);
 			this.stopList.add(stop);
 			stopMap.put(stopName, stop);
+			i++;
 		}
 	}
 

@@ -141,6 +141,7 @@ public class MyLocationListener implements LocationListener {
 		String routeName = null;
 		NodeList sl = null;
 		List<String> stopNames = new LinkedList<String>();
+		List<double[]> stopPos = new LinkedList<double[]>();
 
 		// For each route, get all stops
 		if (nl != null && nl.getLength() > 0) {
@@ -159,18 +160,37 @@ public class MyLocationListener implements LocationListener {
 
 						stopNames.add(stop.getElementsByTagName("name").item(0)
 								.getFirstChild().getNodeValue());
+						stopPos.add(new double[] {
+								Double.valueOf(stop.getElementsByTagName("lat")
+										.item(0).getFirstChild().getNodeValue()),
+								Double.valueOf(stop.getElementsByTagName("lon")
+										.item(0).getFirstChild().getNodeValue()) });
 					}
 				}
 
 				// Initialize the bus with the route name and stop list
-				initBus(routeName, stopNames);
+				initBus(routeName, stopNames, stopPos);
 			}
 		}
 
 	}
 
-	private void initBus(String name, List<String> stopNames) {
-		Bus bus = new Bus(name, stopNames);
+	public void drawRoute() {
+		// TODO: This is for route one, need to selectively choose which route
+		// somehow
+
+		List<Stop> stops = busList.get(0).getStops();
+
+		for (int i = 0; i < stops.size() - 1; i++) {
+			mapOverlays.add(new RouteOverlay(stops.get(i).getPos(), stops.get(
+					i + 1).getPos()));
+			Log.d("tag", "drawing lines");
+		}
+	}
+
+	private void initBus(String name, List<String> stopNames,
+			List<double[]> stopPos) {
+		Bus bus = new Bus(name, stopNames, stopPos);
 		busMap.put(name, bus);
 		busList.add(bus);
 	}

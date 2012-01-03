@@ -16,16 +16,22 @@ if(!empty($_GET['lat']))
 		<lon>".$_GET['lon']."</lon>\n
 		<stop>\n
 			<name>".$name[0]."</name>\n 
+			<lat>30</lat>\n
+			<lon>30</lon>\n
 			<distance>".$distance[0]."</distance>\n
 			<time>".$time[0]."</time>\n
 		</stop>\n
 		<stop>\n
 			<name>".$name[1]."</name>\n
+			<lat>30</lat>\n
+			<lon>50</lon>\n
 			<distance>".$distance[1]."</distance>\n
 			<time>".$time[1]."</time>\n
 		</stop>\n
 		<stop>\n
 			<name>".$name[2]."</name>\n
+			<lat>30</lat>\n
+			<lon>70</lon>\n
 			<distance>".$distance[2]."</distance>\n
 			<time>".$time[2]."</time>\n
 		</stop>\n

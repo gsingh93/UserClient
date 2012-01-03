@@ -13,14 +13,14 @@
 	<stop>
 		<name>Stop2</name>
 		<lat>30</lat>
-		<lon>30</lon>
+		<lon>50</lon>
 		<distance>1</distance>
 		<time>1</time>
 	</stop>
 		<stop>
 		<name>Stop3</name>
 		<lat>30</lat>
-		<lon>30</lon>
+		<lon>70</lon>
 		<distance>1</distance>
 		<time>1</time>
 	</stop>

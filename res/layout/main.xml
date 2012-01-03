@@ -14,6 +14,13 @@
 	    <TextView style="@style/TitleBarText" />
 	    
 	    <ImageView style="@style/TitleBarSeparator" />
+	    
+	    <ImageButton
+	        style="@style/TitleBarButton"
+	        android:onClick="onClickDrawRoute"
+	        android:src="@drawable/crosshair" />
+	    
+	    <ImageView style="@style/TitleBarSeparator" />
 
 	    <ImageButton
 	        style="@style/TitleBarButton"
