@@ -45,6 +45,7 @@
         <item name="android:layout_width">fill_parent</item>
         <item name="android:layout_height">fill_parent</item>
         <item name="android:clickable">true</item>
-        <item name="android:apiKey">0eCUOamfZWjDsIEbRwQ4t7oi1AmFhJe1FieLLIQ</item>
+        <!-- Ubuntu <item name="android:apiKey">0eCUOamfZWjDsIEbRwQ4t7oi1AmFhJe1FieLLIQ</item>-->
+        <!-- Windows --><item name="android:apiKey">0eCUOamfZWjBmFiGNkKroL5JbsBTCD9DwTOaYfQ</item>
 	</style>
 </resources> 
