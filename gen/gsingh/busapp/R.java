@@ -40,6 +40,8 @@ public final class R {
         public static final int hello=0x7f040000;
     }
     public static final class style {
+        /**  Windows <item name="android:apiKey">0eCUOamfZWjBmFiGNkKroL5JbsBTCD9DwTOaYfQ</item>
+         */
         public static final int MapStyle=0x7f050005;
         public static final int TitleBar=0x7f050000;
         public static final int TitleBarButton=0x7f050002;

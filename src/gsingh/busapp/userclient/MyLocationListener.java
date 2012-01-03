@@ -79,6 +79,11 @@ public class MyLocationListener implements LocationListener {
 	MyItemizedOverlay busMarkerOverlay = null;
 
 	/**
+	 * Stop overlay items.
+	 */
+	MyItemizedOverlay stopMarkerOverlay = null;
+
+	/**
 	 * List of all buses/routes in XML file
 	 */
 	private List<Bus> busList = new LinkedList<Bus>();
@@ -99,6 +104,11 @@ public class MyLocationListener implements LocationListener {
 	Drawable busMarker;
 
 	/**
+	 * True when route is shown, false otherwise
+	 */
+	Boolean routeDisplayed = false;
+
+	/**
 	 * Latitude of user
 	 */
 	double lat;
@@ -107,6 +117,8 @@ public class MyLocationListener implements LocationListener {
 	 * Longitude of user
 	 */
 	double lon;
+
+	List<RouteOverlay> routeOverlays = new LinkedList<RouteOverlay>();
 
 	MyLocationListener(Activity activity) {
 		super();
@@ -124,11 +136,12 @@ public class MyLocationListener implements LocationListener {
 		mapOverlays = mapView.getOverlays();
 		userMarkerOverlay = new MyItemizedOverlay(userMarker);
 		busMarkerOverlay = new MyItemizedOverlay(busMarker);
+		stopMarkerOverlay = new MyItemizedOverlay(userMarker);
 
 		// Set up mapview default settings
 		// TODO: Set center to correct location
 		mapView.setBuiltInZoomControls(true);
-		mapController.setZoom(16);
+		// mapController.setZoom(16);
 		GeoPoint center = new GeoPoint((int) (42.2761137 * 1E6),
 				(int) (-83.7431708 * 1E6));
 		mapController.setCenter(center);
@@ -179,13 +192,29 @@ public class MyLocationListener implements LocationListener {
 		// TODO: This is for route one, need to selectively choose which route
 		// somehow
 
-		List<Stop> stops = busList.get(0).getStops();
+		if (routeDisplayed == false) {
+			List<Stop> stops = busList.get(0).getStops();
 
-		for (int i = 0; i < stops.size() - 1; i++) {
-			mapOverlays.add(new RouteOverlay(stops.get(i).getPos(), stops.get(
-					i + 1).getPos()));
-			Log.d("tag", "drawing lines");
+			for (int i = 0; i < stops.size() - 1; i++) {
+				routeOverlays.add(new RouteOverlay(stops.get(i).getPos(), stops
+						.get(i + 1).getPos()));
+
+				stopMarkerOverlay.addOverlay(new OverlayItem(stops.get(i)
+						.getPos(), "", ""));
+			}
+
+			stopMarkerOverlay.addOverlay(new OverlayItem(stops.get(
+					stops.size() - 1).getPos(), "", ""));
+
+			mapOverlays.add(stopMarkerOverlay);
+			mapOverlays.addAll(routeOverlays);
+			routeDisplayed = true;
+		} else {
+			mapOverlays.remove(stopMarkerOverlay);
+			mapOverlays.removeAll(routeOverlays);
+			routeDisplayed = false;
 		}
+		mapView.invalidate();
 	}
 
 	private void initBus(String name, List<String> stopNames,
