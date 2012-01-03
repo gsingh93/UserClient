@@ -5,9 +5,9 @@ if(!empty($_GET['lat']))
 {
 	$file = fopen("coord.xml", 'w');
 	
-	name = $_GET['name'];
-	distance = $_GET['distance'];
-	time = $_GET['time'];
+	$name = $_GET['name'];
+	$distance = $_GET['distance'];
+	$time = $_GET['time'];
 	
 	$text = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n
 	<route>\n
@@ -15,19 +15,19 @@ if(!empty($_GET['lat']))
 		<lat>".$_GET['lat']."</lat>\n
 		<lon>".$_GET['lon']."</lon>\n
 		<stop>\n
-			<name>".name[0]."</name>\n 
-			<distance>".distance[0]."</distance>\n
-			<time>".time[0]."</time>\n
+			<name>".$name[0]."</name>\n 
+			<distance>".$distance[0]."</distance>\n
+			<time>".$time[0]."</time>\n
 		</stop>\n
 		<stop>\n
-			<name>".name[1]."</name>\n
-			<distance>".distance[1]."</distance>\n
-			<time>".time[1]."</time>\n
+			<name>".$name[1]."</name>\n
+			<distance>".$distance[1]."</distance>\n
+			<time>".$time[1]."</time>\n
 		</stop>\n
 		<stop>\n
-			<name>".name[2]."</name>\n
-			<distance>".distance[2]."</distance>\n
-			<time>".time[2]."</time>\n
+			<name>".$name[2]."</name>\n
+			<distance>".$distance[2]."</distance>\n
+			<time>".$time[2]."</time>\n
 		</stop>\n
 	</route>\n";
 	fwrite($file, $text);
