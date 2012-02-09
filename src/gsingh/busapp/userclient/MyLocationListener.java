@@ -1,6 +1,5 @@
 package gsingh.busapp.userclient;
 
-import gsingh.busapp.R;
 import gsingh.busapp.userclient.components.Bus;
 import gsingh.busapp.userclient.components.Route;
 import gsingh.busapp.userclient.components.Stop;
@@ -93,7 +92,7 @@ public class MyLocationListener implements LocationListener {
 	/**
 	 * List of all routes in XML file
 	 */
-	private List<Route> routeList = new LinkedList<Route>();
+	private static List<Route> routeList = new LinkedList<Route>();
 
 	/**
 	 * Map of bus/route name to bus object
@@ -127,6 +126,10 @@ public class MyLocationListener implements LocationListener {
 
 	List<RouteOverlay> routeOverlays = new LinkedList<RouteOverlay>();
 
+	public static List<Route> getRouteList() {
+		return routeList;
+	}
+
 	MyLocationListener(Activity activity) {
 		super();
 		this.display = (TextView) activity.findViewById(R.id.textview);
@@ -157,7 +160,7 @@ public class MyLocationListener implements LocationListener {
 		// Initialize all buses by getting route and stop names from XML file
 
 		// Get all routes from XML file
-		NodeList rl = getRouteList();
+		NodeList rl = getRoutes();
 
 		String routeName = null;
 		NodeList sl = null;
@@ -267,7 +270,7 @@ public class MyLocationListener implements LocationListener {
 		routeList.add(route);
 	}
 
-	private NodeList getRouteList() {
+	private NodeList getRoutes() {
 		// Setup HTTP connection to XML file
 		URL url;
 		NodeList rl = null;
@@ -336,7 +339,7 @@ public class MyLocationListener implements LocationListener {
 	 */
 	private void retreiveBusLocation() {
 		// Get list of routes
-		NodeList rl = getRouteList();
+		NodeList rl = getRoutes();
 
 		// TODO: Refactor
 		if (rl != null && rl.getLength() > 0) {

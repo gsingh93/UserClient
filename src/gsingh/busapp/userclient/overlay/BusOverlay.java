@@ -1,6 +1,6 @@
 package gsingh.busapp.userclient.overlay;
 
-import gsingh.busapp.R;
+import gsingh.busapp.userclient.R;
 import android.app.Activity;
 import android.graphics.drawable.Drawable;
 import android.util.Log;

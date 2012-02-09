@@ -12,8 +12,6 @@ public class StopsOverlay extends MyItemizedOverlay {
 
 	public StopsOverlay(Drawable defaultMarker, Activity activity) {
 		super(defaultMarker);
-
-		this.activity = activity;
 	}
 
 	@Override
