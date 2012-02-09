@@ -6,6 +6,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.maps.MapActivity;
@@ -26,6 +27,8 @@ public class UserClientActivity extends MapActivity {
 	 * and instructions
 	 */
 	private TextView display = null;
+	LinearLayout popup = null;
+	boolean popupDisplayed = false;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -33,6 +36,7 @@ public class UserClientActivity extends MapActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		display = (TextView) findViewById(R.id.textview);
+		this.popup = (LinearLayout) findViewById(R.id.popupwindow);
 
 		/* Use the LocationManager class to obtain GPS locations */
 		locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -40,14 +44,28 @@ public class UserClientActivity extends MapActivity {
 		locListener = new MyLocationListener(this);
 	}
 
+	/**
+	 * Click listener for locate button
+	 * 
+	 * @param v
+	 */
 	public void onClickLocate(View v) {
 		locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0,
 				locListener);
 		display.setText("Locating...");
 	}
 
+	/**
+	 * Click listener for draw route button
+	 * 
+	 * @param v
+	 */
 	public void onClickDrawRoute(View v) {
 		((MyLocationListener) locListener).drawRoute();
+	}
+	
+	public void onClickDisplayRoutes(View v) {
+		onClickDrawRoute(v);
 	}
 
 	@Override

@@ -1,5 +1,4 @@
 Figure out the text view properties
-Learn correct units
 
 Application Flow:
 BusClient - Updates server with Long/Lat corresponding to route name
@@ -12,6 +11,10 @@ UserClient - Polls server for information for all routes
 		If route.name == routename;
 			Change Map Pos.
 			
+BusOverlay displays popup with bus information on tap
+StopsOverlay displays stop name on tap
+Bus contains all stops? What about route list?
+
 
 4. Retrieve bus info at regular intervals
 5. Have server calculate arrival distance/time and send to UserClient

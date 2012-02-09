@@ -1,4 +1,4 @@
-package gsingh.busapp.userclient;
+package gsingh.busapp.userclient.overlay;
 
 import java.util.ArrayList;
 
@@ -7,9 +7,16 @@ import android.graphics.drawable.Drawable;
 import com.google.android.maps.ItemizedOverlay;
 import com.google.android.maps.OverlayItem;
 
+/**
+ * Wrapper for list of {@link OverlayItem}s
+ * 
+ * @author Gulshan
+ * 
+ */
 public class MyItemizedOverlay extends ItemizedOverlay<OverlayItem> {
 
-	ArrayList<OverlayItem> overlays = new ArrayList<OverlayItem>();
+	protected ArrayList<OverlayItem> overlays = new ArrayList<OverlayItem>();
+
 
 	public MyItemizedOverlay(Drawable defaultMarker) {
 		super(boundCenterBottom(defaultMarker));

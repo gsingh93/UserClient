@@ -1,7 +1,14 @@
 package gsingh.busapp.userclient;
 
 import gsingh.busapp.R;
-import gsingh.busapp.userclient.Bus.Stop;
+import gsingh.busapp.userclient.components.Bus;
+import gsingh.busapp.userclient.components.Route;
+import gsingh.busapp.userclient.components.Stop;
+import gsingh.busapp.userclient.overlay.BusOverlay;
+import gsingh.busapp.userclient.overlay.BusOverlayItem;
+import gsingh.busapp.userclient.overlay.MyItemizedOverlay;
+import gsingh.busapp.userclient.overlay.RouteOverlay;
+import gsingh.busapp.userclient.overlay.StopsOverlay;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -84,14 +91,14 @@ public class MyLocationListener implements LocationListener {
 	MyItemizedOverlay stopMarkerOverlay = null;
 
 	/**
-	 * List of all buses/routes in XML file
+	 * List of all routes in XML file
 	 */
-	private List<Bus> busList = new LinkedList<Bus>();
+	private List<Route> routeList = new LinkedList<Route>();
 
 	/**
 	 * Map of bus/route name to bus object
 	 */
-	private Map<String, Bus> busMap = new HashMap<String, Bus>();
+	private Map<String, Route> routeMap = new HashMap<String, Route>();
 
 	/**
 	 * Image displayed at user position
@@ -126,41 +133,44 @@ public class MyLocationListener implements LocationListener {
 		this.mapView = (MapView) activity.findViewById(R.id.mapview);
 		this.userMarker = activity.getResources().getDrawable(
 				R.drawable.usermarker);
-		this.busMarker = activity.getResources().getDrawable(
-				R.drawable.busmarker);
+		this.busMarker = activity.getResources().getDrawable(R.drawable.bus);
 
 		// Get MapController
 		mapController = mapView.getController();
 
 		// Get list of overlays on map
 		mapOverlays = mapView.getOverlays();
-		userMarkerOverlay = new MyItemizedOverlay(userMarker);
-		busMarkerOverlay = new MyItemizedOverlay(busMarker);
-		stopMarkerOverlay = new MyItemizedOverlay(userMarker);
 
-		// Set up mapview default settings
-		// TODO: Set center to correct location
+		// Initialize overlays
+		userMarkerOverlay = new MyItemizedOverlay(userMarker);
+		busMarkerOverlay = new BusOverlay(busMarker, activity);
+		stopMarkerOverlay = new StopsOverlay(userMarker, activity);
+
+		// Initialize default MapView settings
 		mapView.setBuiltInZoomControls(true);
-		// mapController.setZoom(16);
-		GeoPoint center = new GeoPoint((int) (42.2761137 * 1E6),
-				(int) (-83.7431708 * 1E6));
+		mapController.setZoom(16);
+		GeoPoint center = new GeoPoint((int) (42.27778 * 1E6),
+				(int) (-83.73503 * 1E6));
 		mapController.setCenter(center);
 
+		// TODO: Refactor
 		// Initialize all buses by getting route and stop names from XML file
 
 		// Get all routes from XML file
-		NodeList nl = getRouteList();
+		NodeList rl = getRouteList();
 
 		String routeName = null;
 		NodeList sl = null;
 		List<String> stopNames = new LinkedList<String>();
 		List<double[]> stopPos = new LinkedList<double[]>();
+		List<double[]> routeGP = new LinkedList<double[]>();
 
 		// For each route, get all stops
-		if (nl != null && nl.getLength() > 0) {
-			for (int i = 0; i < nl.getLength(); i++) {
-				Element route = (Element) nl.item(i);
+		if (rl != null && rl.getLength() > 0) {
+			for (int i = 0; i < rl.getLength(); i++) {
+				Element route = (Element) rl.item(i);
 
+				// Get the name of the route
 				routeName = route.getElementsByTagName("name").item(0)
 						.getFirstChild().getNodeValue();
 
@@ -171,8 +181,11 @@ public class MyLocationListener implements LocationListener {
 					for (int j = 0; j < sl.getLength(); j++) {
 						Element stop = (Element) sl.item(j);
 
+						// Add the stop name to the list
 						stopNames.add(stop.getElementsByTagName("name").item(0)
 								.getFirstChild().getNodeValue());
+
+						// Add the position of the stop to the list
 						stopPos.add(new double[] {
 								Double.valueOf(stop.getElementsByTagName("lat")
 										.item(0).getFirstChild().getNodeValue()),
@@ -181,30 +194,60 @@ public class MyLocationListener implements LocationListener {
 					}
 				}
 
+				// Get route geopoints
+				NodeList gpl = ((Element) route.getElementsByTagName("routegp")
+						.item(0)).getElementsByTagName("gp");
+
+				if (gpl != null && gpl.getLength() > 0) {
+					for (int j = 0; j < gpl.getLength(); j++) {
+						Element gp = (Element) gpl.item(j);
+
+						routeGP.add(new double[] {
+								Double.valueOf(gp.getElementsByTagName("lat")
+										.item(0).getFirstChild().getNodeValue()),
+								Double.valueOf(gp.getElementsByTagName("lon")
+										.item(0).getFirstChild().getNodeValue()) });
+
+						Log.d("lat", String.valueOf(gp
+								.getElementsByTagName("lat").item(0)
+								.getFirstChild().getNodeValue()));
+					}
+				}
+
 				// Initialize the bus with the route name and stop list
-				initBus(routeName, stopNames, stopPos);
+				initRoute(routeName, stopNames, stopPos, routeGP);
 			}
 		}
 
+		// TODO: coord.xml will have bus tag, but for now, just make one bus
+		routeList.get(0).addBus(new Bus("North Commuter1"));
 	}
 
+	// TODO: Reuse old route if not updated
+	// TODO: Refactor to Route class
 	public void drawRoute() {
 		// TODO: This is for route one, need to selectively choose which route
 		// somehow
 
+		Route route = routeList.get(0);
 		if (routeDisplayed == false) {
-			List<Stop> stops = busList.get(0).getStops();
+			List<Stop> stops = route.getStops();
+			List<GeoPoint> routeGP = route.getGeoPoints();
 
-			for (int i = 0; i < stops.size() - 1; i++) {
-				routeOverlays.add(new RouteOverlay(stops.get(i).getPos(), stops
-						.get(i + 1).getPos()));
+			Log.d("tag", String.valueOf(routeGP.size()));
 
-				stopMarkerOverlay.addOverlay(new OverlayItem(stops.get(i)
-						.getPos(), "", ""));
+			// Adds route GeoPoints to routeOverlays
+			for (int i = 0; i < routeGP.size() - 1; i++) {
+				Log.d("lat", String.valueOf(routeGP.get(i).getLatitudeE6()));
+				routeOverlays.add(new RouteOverlay(routeGP.get(i), routeGP
+						.get(i + 1)));
 			}
 
-			stopMarkerOverlay.addOverlay(new OverlayItem(stops.get(
-					stops.size() - 1).getPos(), "", ""));
+			// Adds stop GeoPoints to stopMarkerOverlay
+			for (Stop stop : stops) {
+				stopMarkerOverlay.addOverlay(new OverlayItem(stop.getPos(),
+						stop.getName(), stop.getName()));
+			}
 
 			mapOverlays.add(stopMarkerOverlay);
 			mapOverlays.addAll(routeOverlays);
@@ -217,17 +260,17 @@ public class MyLocationListener implements LocationListener {
 		mapView.invalidate();
 	}
 
-	private void initBus(String name, List<String> stopNames,
-			List<double[]> stopPos) {
-		Bus bus = new Bus(name, stopNames, stopPos);
-		busMap.put(name, bus);
-		busList.add(bus);
+	private void initRoute(String name, List<String> stopNames,
+			List<double[]> stopPos, List<double[]> routeGP) {
+		Route route = new Route(name, stopNames, stopPos, routeGP);
+		routeMap.put(name, route);
+		routeList.add(route);
 	}
 
 	private NodeList getRouteList() {
 		// Setup HTTP connection to XML file
 		URL url;
-		NodeList nl = null;
+		NodeList rl = null;
 		try {
 			url = new URL(SERVERNAME + FILENAME);
 			InputStream URLStream = url.openStream();
@@ -239,7 +282,7 @@ public class MyLocationListener implements LocationListener {
 
 			Element docEl = dom.getDocumentElement();
 
-			nl = docEl.getElementsByTagName("route");
+			rl = docEl.getElementsByTagName("route");
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -254,21 +297,25 @@ public class MyLocationListener implements LocationListener {
 			e.printStackTrace();
 		}
 
-		return nl;
+		return rl;
 	}
 
 	private void updateScreenText() {
-		// TODO: Use StringBuilder or format()
 		// Create text to be displayed on screen
-		String Text = "My current location is: " + "\nLatitude = " + lat
-				+ "\nLongitude = " + lon;
+		StringBuilder sb = new StringBuilder("My current location is: ");
+		sb.append("\nLatitude = ").append(lat);
+		sb.append("\nLongitude = ").append(lon);
+		sb.append("\n\nCheck").append(SERVERNAME).append("/bus.php ")
+				.append(" to see your location");
 
 		// Display location
-		display.setText(Text
-				+ "\n\nCheck http://michigangurudwara.com/bus.php to see your location");
+		display.setText(sb.toString());
 	}
 
-	// TODO: Analyze both overlays
+	// TODO: Analyze both overlays to make sure no commands are wasted
+	/**
+	 * Updates user location on map and centers on location
+	 */
 	private void updateUserLocation() {
 		userMarkerOverlay.clear();
 
@@ -288,16 +335,20 @@ public class MyLocationListener implements LocationListener {
 	 * Gets coordinates for all buses
 	 */
 	private void retreiveBusLocation() {
-		// Get list of buses/routes
-		NodeList nl = getRouteList();
+		// Get list of routes
+		NodeList rl = getRouteList();
 
-		if (nl != null && nl.getLength() > 0) {
-			for (int i = 0; i < nl.getLength(); i++) {
-				Element routeEl = (Element) nl.item(i);
+		// TODO: Refactor
+		if (rl != null && rl.getLength() > 0) {
+			for (int i = 0; i < rl.getLength(); i++) {
+				Element routeEl = (Element) rl.item(i);
 				String name = routeEl.getElementsByTagName("name").item(0)
 						.getFirstChild().getNodeValue();
 
-				Bus bus = (Bus) busMap.get(name);
+				Route route = (Route) routeMap.get(name);
+
+				// TODO: Get each bus instead of first one
+				Bus bus = route.getBuses().get(0);
 
 				bus.setPos(
 						Double.valueOf(routeEl.getElementsByTagName("lat")
@@ -314,7 +365,7 @@ public class MyLocationListener implements LocationListener {
 						String stopName = stopEl.getElementsByTagName("name")
 								.item(0).getFirstChild().getNodeValue();
 
-						Stop stop = bus.getStop(stopName);
+						Stop stop = route.getStop(stopName);
 
 						stop.setArrivalInfo(
 								Double.valueOf(stopEl
@@ -346,20 +397,27 @@ public class MyLocationListener implements LocationListener {
 		 */
 	}
 
+	/**
+	 * Updates bus location on map
+	 */
 	public void updateBusLocation() {
 		busMarkerOverlay.clear();
 
 		mapOverlays.remove(busMarkerOverlay);
 
-		for (Bus bus : busList) {
-			GeoPoint point = new GeoPoint((int) (bus.getPos()[0] * 1E6),
-					(int) (bus.getPos()[1] * 1E6));
-			OverlayItem overlayItem = new OverlayItem(point, "", "");
-			Log.d("tag", String.valueOf(bus.getPos()[0]));
-			Log.d("tag", String.valueOf(bus.getPos()[1]));
+		Log.d("tag", String.valueOf(routeList.size()));
 
-			busMarkerOverlay.addOverlay(overlayItem);
-			mapOverlays.add(busMarkerOverlay);
+		for (Route route : routeList) {
+			for (Bus bus : route.getBuses()) {
+				GeoPoint point = bus.getPos();
+				BusOverlayItem overlayItem = new BusOverlayItem(point,
+						bus.getName(), bus.getName());
+				Log.d("tag", String.valueOf(point.getLatitudeE6()));
+				Log.d("tag", String.valueOf(point.getLongitudeE6()));
+
+				busMarkerOverlay.addOverlay(overlayItem);
+				mapOverlays.add(busMarkerOverlay);
+			}
 		}
 
 		mapView.invalidate();

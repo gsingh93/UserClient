@@ -1,27 +1,101 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <route>
 	<name>North Commuter</name>
-	<lat>80</lat>
-	<lon>40</lon>
+	<lat>42.274918</lat>
+	<lon>-83.740692</lon>
 	<stop>
-		<name>Stop1</name>
-		<lat>30</lat>
-		<lon>30</lon>
+		<name>CC Little</name>
+		<lat>42.27778</lat>
+		<lon>-83.73503</lon>
 		<distance>1</distance>
 		<time>1</time>
 	</stop>
 	<stop>
-		<name>Stop2</name>
-		<lat>30</lat>
-		<lon>50</lon>
+		<name>Shapiro</name>
+		<lat>42.27508</lat>
+		<lon>-83.73754</lon>
 		<distance>1</distance>
 		<time>1</time>
 	</stop>
 		<stop>
-		<name>Stop3</name>
-		<lat>30</lat>
-		<lon>70</lon>
+		<name>Union</name>
+		<lat>42.27501</lat>
+		<lon>-83.74044</lon>
 		<distance>1</distance>
 		<time>1</time>
 	</stop>
+	<routegp>
+		<gp>
+			<lon>-83.740700</lon>
+			<lat>42.275211</lat>
+		</gp>
+		<gp>
+			<lon>-83.740692</lon>
+			<lat>42.274921</lat>
+		</gp>
+		<gp>
+			<lon>-83.740692</lon>
+			<lat>42.274921</lat>
+		</gp>
+		<gp>
+			<lon>-83.734612</lon>
+			<lat>42.275009</lat>
+		</gp>
+		<gp>
+			<lon>-83.734612</lon>
+			<lat>42.275009</lat>
+		</gp>
+		<gp>
+			<lon>-83.734680</lon>
+			<lat>42.277382</lat>
+		</gp>
+		<gp>
+			<lon>-83.734489</lon>
+			<lat>42.277611</lat>
+		</gp>
+		<gp>
+			<lon>-83.734489</lon>
+			<lat>42.277611</lat>
+		</gp>
+		<gp>
+			<lon>-83.735336</lon>
+			<lat>42.278271</lat>
+		</gp>
+		<gp>
+			<lon>-83.735336</lon>
+			<lat>42.278271</lat>
+		</gp>
+		<gp>
+			<lon>-83.735802</lon>
+			<lat>42.278610</lat>
+		</gp>
+		<gp>
+			<lon>-83.736069</lon>
+			<lat>42.278679</lat>
+		</gp>
+		<gp>
+			<lon>-83.736343</lon>
+			<lat>42.278702</lat>
+		</gp>
+		<gp>
+			<lon>-83.739571</lon>
+			<lat>42.278648</lat>
+		</gp>
+		<gp>
+			<lon>-83.739693</lon>
+			<lat>42.278599</lat>
+		</gp>
+		<gp>
+			<lon>-83.740799</lon>
+			<lat>42.278591</lat>
+		</gp>
+		<gp>
+			<lon>-83.740799</lon>
+			<lat>42.278591</lat>
+		</gp>
+		<gp>
+			<lon>-83.740700</lon>
+			<lat>42.275211</lat>
+		</gp>
+	</routegp>
 </route>
