@@ -276,6 +276,7 @@ public class MyLocationListener implements LocationListener {
 
 		Route route = routeMap.get(routeName);
 
+		Log.d("routename", routeName);
 		if (!route.isRouteDisplayed()) {
 			route.drawRoute(routeOverlays, stopMarkerOverlay);
 

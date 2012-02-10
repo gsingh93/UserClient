@@ -33,7 +33,10 @@ public class BusOverlay extends MyItemizedOverlay {
 		if (popupDisplayed == false) {
 			animation = AnimationUtils.loadAnimation(activity, R.anim.slideup);
 
-			busName.setText(overlays.get(index).getTitle());
+			String title = overlays.get(index).getTitle();
+			title = title.substring(0, title.length() - 1);
+
+			busName.setText(title);
 			popup.setVisibility(View.VISIBLE);
 			popup.startAnimation(animation);
 			popupDisplayed = true;

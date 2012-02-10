@@ -70,9 +70,8 @@ public class UserClientActivity extends MapActivity {
 		if (routeName == null || routeName == "") {
 			Log.d("ERROR", "No routename");
 			routeName = "North Commuter";
-		} else {
-			routeName = routeName.substring(0, routeName.length() - 1);
 		}
+
 		Log.d("route name", routeName);
 		((MyLocationListener) locListener).drawRoute(routeName);
 	}
