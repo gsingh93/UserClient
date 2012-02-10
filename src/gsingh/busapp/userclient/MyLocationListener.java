@@ -4,7 +4,6 @@ import gsingh.busapp.userclient.components.Bus;
 import gsingh.busapp.userclient.components.Route;
 import gsingh.busapp.userclient.components.Stop;
 import gsingh.busapp.userclient.overlay.BusOverlay;
-import gsingh.busapp.userclient.overlay.BusOverlayItem;
 import gsingh.busapp.userclient.overlay.MyItemizedOverlay;
 import gsingh.busapp.userclient.overlay.RouteOverlay;
 import gsingh.busapp.userclient.overlay.StopsOverlay;
@@ -138,6 +137,8 @@ public class MyLocationListener implements LocationListener {
 				R.drawable.usermarker);
 		this.busMarker = activity.getResources().getDrawable(R.drawable.bus);
 
+		/******************** Initialize Map Objects ********************/
+
 		// Get MapController
 		mapController = mapView.getController();
 
@@ -156,110 +157,137 @@ public class MyLocationListener implements LocationListener {
 				(int) (-83.73503 * 1E6));
 		mapController.setCenter(center);
 
-		// TODO: Refactor
-		// Initialize all buses by getting route and stop names from XML file
+		/******************** Initialize Routes ********************/
 
 		// Get all routes from XML file
 		NodeList rl = getRoutes();
 
-		String routeName = null;
-		NodeList sl = null;
 		List<String> stopNames = new LinkedList<String>();
 		List<double[]> stopPos = new LinkedList<double[]>();
 		List<double[]> routeGP = new LinkedList<double[]>();
+		int routeNumber = 0;
 
-		// For each route, get all stops
+		// Initialize route information
 		if (rl != null && rl.getLength() > 0) {
 			for (int i = 0; i < rl.getLength(); i++) {
 				Element route = (Element) rl.item(i);
 
 				// Get the name of the route
-				routeName = route.getElementsByTagName("name").item(0)
+				String routeName = route.getElementsByTagName("name").item(0)
 						.getFirstChild().getNodeValue();
 
-				// For each stop, get the stop name and add it to the list
-				sl = route.getElementsByTagName("stop");
+				// For each stop, get the stop name and position and add it to
+				// the corresponding lists
+				addStopPositionsAndNames(route, stopNames, stopPos);
 
-				if (sl != null && sl.getLength() > 0) {
-					for (int j = 0; j < sl.getLength(); j++) {
-						Element stop = (Element) sl.item(j);
-
-						// Add the stop name to the list
-						stopNames.add(stop.getElementsByTagName("name").item(0)
-								.getFirstChild().getNodeValue());
-
-						// Add the position of the stop to the list
-						stopPos.add(new double[] {
-								Double.valueOf(stop.getElementsByTagName("lat")
-										.item(0).getFirstChild().getNodeValue()),
-								Double.valueOf(stop.getElementsByTagName("lon")
-										.item(0).getFirstChild().getNodeValue()) });
-					}
-				}
-
-				// Get route geopoints
-				NodeList gpl = ((Element) route.getElementsByTagName("routegp")
-						.item(0)).getElementsByTagName("gp");
-
-				if (gpl != null && gpl.getLength() > 0) {
-					for (int j = 0; j < gpl.getLength(); j++) {
-						Element gp = (Element) gpl.item(j);
-
-						routeGP.add(new double[] {
-								Double.valueOf(gp.getElementsByTagName("lat")
-										.item(0).getFirstChild().getNodeValue()),
-								Double.valueOf(gp.getElementsByTagName("lon")
-										.item(0).getFirstChild().getNodeValue()) });
-
-						Log.d("lat", String.valueOf(gp
-								.getElementsByTagName("lat").item(0)
-								.getFirstChild().getNodeValue()));
-					}
-				}
+				// Add route geopoints to routeGP list
+				addGeoPoints(route, routeGP);
 
 				// Initialize the bus with the route name and stop list
 				initRoute(routeName, stopNames, stopPos, routeGP);
+
+				// Adds the buses for each stop to the route
+				addBuses(route, routeNumber, routeName);
+				
+				// Increment the route counter
+				routeNumber++;
 			}
 		}
 
-		// TODO: coord.xml will have bus tag, but for now, just make one bus
-		routeList.get(0).addBus(new Bus("North Commuter1"));
+	}
+
+	/**
+	 * For each stop, get the stop name and position and add it to the
+	 * corresponding lists
+	 * 
+	 * @param route
+	 * @param stopNames
+	 * @param stopPos
+	 */
+	private void addStopPositionsAndNames(Element route,
+			List<String> stopNames, List<double[]> stopPos) {
+		NodeList sl = route.getElementsByTagName("stop");
+
+		if (sl != null && sl.getLength() > 0) {
+			for (int j = 0; j < sl.getLength(); j++) {
+				Element stop = (Element) sl.item(j);
+
+				// Add the stop name to the list
+				stopNames.add(stop.getElementsByTagName("name").item(0)
+						.getFirstChild().getNodeValue());
+
+				// Add the position of the stop to the list
+				stopPos.add(new double[] {
+						Double.valueOf(stop.getElementsByTagName("lat").item(0)
+								.getFirstChild().getNodeValue()),
+						Double.valueOf(stop.getElementsByTagName("lon").item(0)
+								.getFirstChild().getNodeValue()) });
+			}
+		}
+	}
+	
+	/**
+	 * Add route geopoints to routeGP list
+	 * 
+	 * @param route
+	 * @param routeGP
+	 */
+	private void addGeoPoints(Element route, List<double[]> routeGP) {
+		NodeList gpl = ((Element) route.getElementsByTagName("routegp").item(0))
+				.getElementsByTagName("gp");
+
+		if (gpl != null && gpl.getLength() > 0) {
+			for (int j = 0; j < gpl.getLength(); j++) {
+				Element gp = (Element) gpl.item(j);
+
+				routeGP.add(new double[] {
+						Double.valueOf(gp.getElementsByTagName("lat")
+								.item(0).getFirstChild().getNodeValue()),
+						Double.valueOf(gp.getElementsByTagName("lon")
+								.item(0).getFirstChild().getNodeValue()) });
+			}
+		}
+	}
+
+	/**
+	 * Adds the buses in route to the route's bus list, appending the bus number
+	 * to the end of the route name to make the bus name
+	 * 
+	 * @param route
+	 * @param routeNumber
+	 * @param routeName
+	 */
+	private void addBuses(Element route, int routeNumber, String routeName) {
+		NodeList bl = route.getElementsByTagName("bus");
+		if (bl != null && bl.getLength() > 0) {
+			for (int j = 0; j < bl.getLength(); j++) {
+				routeList.get(routeNumber).addBus(new Bus(routeName + j));
+			}
+		}
 	}
 
 	// TODO: Reuse old route if not updated
-	// TODO: Refactor to Route class
-	public void drawRoute() {
-		// TODO: This is for route one, need to selectively choose which route
-		// somehow
+	/**
+	 * Draws the route specified by routeName on the map
+	 * 
+	 * @param routeName
+	 */
+	public void drawRoute(String routeName) {
 
-		Route route = routeList.get(0);
-		if (routeDisplayed == false) {
-			List<Stop> stops = route.getStops();
-			List<GeoPoint> routeGP = route.getGeoPoints();
+		Route route = routeMap.get(routeName);
 
-			Log.d("tag", String.valueOf(routeGP.size()));
-
-			// Adds route GeoPoints to routeOverlays
-			for (int i = 0; i < routeGP.size() - 1; i++) {
-				Log.d("lat", String.valueOf(routeGP.get(i).getLatitudeE6()));
-				routeOverlays.add(new RouteOverlay(routeGP.get(i), routeGP
-						.get(i + 1)));
-			}
-
-			// Adds stop GeoPoints to stopMarkerOverlay
-			for (Stop stop : stops) {
-				stopMarkerOverlay.addOverlay(new OverlayItem(stop.getPos(),
-						stop.getName(), stop.getName()));
-			}
+		if (!route.isRouteDisplayed()) {
+			route.drawRoute(routeOverlays, stopMarkerOverlay);
 
 			mapOverlays.add(stopMarkerOverlay);
 			mapOverlays.addAll(routeOverlays);
-			routeDisplayed = true;
+			route.setRouteDisplayed(true);
 		} else {
 			mapOverlays.remove(stopMarkerOverlay);
 			mapOverlays.removeAll(routeOverlays);
-			routeDisplayed = false;
+			route.setRouteDisplayed(false);
 		}
+
 		mapView.invalidate();
 	}
 
@@ -287,16 +315,12 @@ public class MyLocationListener implements LocationListener {
 
 			rl = docEl.getElementsByTagName("route");
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (SAXException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -337,11 +361,10 @@ public class MyLocationListener implements LocationListener {
 	/**
 	 * Gets coordinates for all buses
 	 */
-	private void retreiveBusLocation() {
+	private void retrieveBusLocation() {
 		// Get list of routes
 		NodeList rl = getRoutes();
 
-		// TODO: Refactor
 		if (rl != null && rl.getLength() > 0) {
 			for (int i = 0; i < rl.getLength(); i++) {
 				Element routeEl = (Element) rl.item(i);
@@ -350,54 +373,64 @@ public class MyLocationListener implements LocationListener {
 
 				Route route = (Route) routeMap.get(name);
 
-				// TODO: Get each bus instead of first one
-				Bus bus = route.getBuses().get(0);
+				// Updates bus position
+				retrieveBusPosition(route, routeEl);
 
-				bus.setPos(
-						Double.valueOf(routeEl.getElementsByTagName("lat")
-								.item(0).getFirstChild().getNodeValue()),
-						Double.valueOf(routeEl.getElementsByTagName("lon")
-								.item(0).getFirstChild().getNodeValue()));
-
-				NodeList sl = routeEl.getElementsByTagName("stop");
-
-				if (sl != null && sl.getLength() > 0) {
-					for (int j = 0; j < sl.getLength(); j++) {
-						Element stopEl = (Element) sl.item(j);
-
-						String stopName = stopEl.getElementsByTagName("name")
-								.item(0).getFirstChild().getNodeValue();
-
-						Stop stop = route.getStop(stopName);
-
-						stop.setArrivalInfo(
-								Double.valueOf(stopEl
-										.getElementsByTagName("time").item(0)
-										.getFirstChild().getNodeValue()),
-								Double.valueOf(stopEl
-										.getElementsByTagName("distance")
-										.item(0).getFirstChild().getNodeValue()));
-
-					}
-				}
+				// Updates distance and time information
+				retrieveStopInformation(route, routeEl);
 			}
 		}
+	}
 
-		/*
-		 * String s;
-		 * 
-		 * InputStream URLStream1 = url.openStream(); InputStreamReader isr =
-		 * new InputStreamReader(URLStream1); BufferedReader br = new
-		 * BufferedReader(isr);
-		 * 
-		 * while ((s = br.readLine()) != null) { Log.d("tag1",
-		 * String.valueOf(s)); }
-		 */
+	/**
+	 * Retrieves bus positions from server
+	 * 
+	 * @param route
+	 * @param routeEl
+	 */
+	private void retrieveBusPosition(Route route, Element routeEl) {
+		NodeList bl = routeEl.getElementsByTagName("bus");
 
-		/*
-		 * String response = hc.execute(postMethod, handler); Log.d("tag",
-		 * response);
-		 */
+		if (bl != null && bl.getLength() > 0) {
+			for (int j = 0; j < bl.getLength(); j++) {
+				Bus bus = route.getBuses().get(j);
+				Element busEl = (Element) bl.item(j);
+
+				bus.setPos(
+						Double.valueOf(busEl.getElementsByTagName("lat")
+								.item(0).getFirstChild().getNodeValue()),
+						Double.valueOf(busEl.getElementsByTagName("lon")
+								.item(0).getFirstChild().getNodeValue()));
+			}
+		}
+	}
+
+	/**
+	 * Retrieves stop information (distance and time) from server
+	 * 
+	 * @param route
+	 * @param routeEl
+	 */
+	private void retrieveStopInformation(Route route, Element routeEl) {
+		NodeList sl = routeEl.getElementsByTagName("stop");
+
+		if (sl != null && sl.getLength() > 0) {
+			for (int j = 0; j < sl.getLength(); j++) {
+				Element stopEl = (Element) sl.item(j);
+
+				String stopName = stopEl.getElementsByTagName("name").item(0)
+						.getFirstChild().getNodeValue();
+
+				Stop stop = route.getStop(stopName);
+
+				stop.setArrivalInfo(
+						Double.valueOf(stopEl.getElementsByTagName("time")
+								.item(0).getFirstChild().getNodeValue()),
+						Double.valueOf(stopEl.getElementsByTagName("distance")
+								.item(0).getFirstChild().getNodeValue()));
+
+			}
+		}
 	}
 
 	/**
@@ -413,10 +446,8 @@ public class MyLocationListener implements LocationListener {
 		for (Route route : routeList) {
 			for (Bus bus : route.getBuses()) {
 				GeoPoint point = bus.getPos();
-				BusOverlayItem overlayItem = new BusOverlayItem(point,
+				OverlayItem overlayItem = new OverlayItem(point,
 						bus.getName(), bus.getName());
-				Log.d("tag", String.valueOf(point.getLatitudeE6()));
-				Log.d("tag", String.valueOf(point.getLongitudeE6()));
 
 				busMarkerOverlay.addOverlay(overlayItem);
 				mapOverlays.add(busMarkerOverlay);
@@ -440,7 +471,7 @@ public class MyLocationListener implements LocationListener {
 		// TODO: This function should be called separately in regular intervals
 		// or wait until one bus location changes
 		// Gets bus locations for all buses
-		retreiveBusLocation();
+		retrieveBusLocation();
 
 		// Update bus location on map view
 		updateBusLocation();

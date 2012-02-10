@@ -1,11 +1,15 @@
 package gsingh.busapp.userclient.components;
 
+import gsingh.busapp.userclient.overlay.MyItemizedOverlay;
+import gsingh.busapp.userclient.overlay.RouteOverlay;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import com.google.android.maps.GeoPoint;
+import com.google.android.maps.OverlayItem;
 
 public class Route {
 
@@ -14,6 +18,7 @@ public class Route {
 	private List<GeoPoint> geoPoints = new LinkedList<GeoPoint>();
 
 	private String name = null;
+	public boolean routeDisplayed = false;
 
 	private Map<String, Stop> stopMap = new HashMap<String, Stop>();
 
@@ -40,8 +45,31 @@ public class Route {
 		return new GeoPoint((int) (lat * 1E6), (int) (lon * 1E6));
 	}
 
-	public void drawRoute() {
+	public boolean isRouteDisplayed() {
+		return routeDisplayed;
+	}
 
+	public void setRouteDisplayed(boolean bool) {
+		routeDisplayed = bool;
+	}
+
+	public void drawRoute(List<RouteOverlay> routeOverlays, MyItemizedOverlay stopMarkerOverlay) {
+		if (routeDisplayed == false) {
+			List<Stop> stops = this.getStops();
+			List<GeoPoint> routeGP = this.getGeoPoints();
+
+			// Adds route GeoPoints to routeOverlays
+			for (int i = 0; i < routeGP.size() - 1; i++) {
+				routeOverlays.add(new RouteOverlay(routeGP.get(i), routeGP
+						.get(i + 1)));
+			}
+
+			// Adds stop GeoPoints to stopMarkerOverlay
+			for (Stop stop : stops) {
+				stopMarkerOverlay.addOverlay(new OverlayItem(stop.getPos(),
+						stop.getName(), stop.getName()));
+			}
+		}
 	}
 
 	public List<String> getStopNames() {

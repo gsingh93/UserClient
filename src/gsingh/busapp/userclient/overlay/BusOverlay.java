@@ -32,13 +32,13 @@ public class BusOverlay extends MyItemizedOverlay {
 		Animation animation;
 		if (popupDisplayed == false) {
 			animation = AnimationUtils.loadAnimation(activity, R.anim.slideup);
-			popup.setVisibility(View.VISIBLE);
+
 			busName.setText(overlays.get(index).getTitle());
+			popup.setVisibility(View.VISIBLE);
 			popup.startAnimation(animation);
 			popupDisplayed = true;
 		} else {
-			animation = AnimationUtils
-					.loadAnimation(activity, R.anim.slidedown);
+			animation = AnimationUtils.loadAnimation(activity, R.anim.slidedown);
 			popup.setVisibility(View.INVISIBLE);
 			popup.startAnimation(animation);
 			popupDisplayed = false;

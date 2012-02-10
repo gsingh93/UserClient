@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <route>
 	<name>North Commuter</name>
-	<lat>42.274918</lat>
-	<lon>-83.740692</lon>
+	<bus>
+		<lat>42.274918</lat>
+		<lon>-83.740692</lon>
+	</bus>
 	<stop>
 		<name>CC Little</name>
 		<lat>42.27778</lat>

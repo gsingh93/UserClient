@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -64,7 +65,16 @@ public class UserClientActivity extends MapActivity {
 	 * @param v
 	 */
 	public void onClickDrawRoute(View v) {
-		((MyLocationListener) locListener).drawRoute();
+		String routeName = (String) ((TextView) this.findViewById(R.id.busname))
+				.getText();
+		if (routeName == null || routeName == "") {
+			Log.d("ERROR", "No routename");
+			routeName = "North Commuter";
+		} else {
+			routeName = routeName.substring(0, routeName.length() - 1);
+		}
+		Log.d("route name", routeName);
+		((MyLocationListener) locListener).drawRoute(routeName);
 	}
 	
 	public void onClickDisplayRoutes(View v) {

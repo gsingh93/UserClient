@@ -12,10 +12,13 @@ UserClient - Polls server for information for all routes
 		If route.name == routename;
 			Change Map Pos.
 
-0. Add little popup when stop clicked
-1. Add menu
+1. Add little popup when stop clicked
 2. Add Stop List/Route List page
-3. Add <bus> tag to xml and parsing to code
+	Route List will display stops under route with time/distance information.
+	Clicking on stop will go to stop on map
+	Stop List will display buses that go to stop with time/distance information.
+	Clicking on stop will go to stop
+	Add filters/sorting
 4. Retrieve bus info at regular intervals
 5. Have server calculate arrival distance/time and send to UserClient
 6. Change GET to POST
